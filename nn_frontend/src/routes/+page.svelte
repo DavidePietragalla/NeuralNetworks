@@ -38,7 +38,9 @@
 
   // SVELTE 5: I parametri degli eventi vengono passati direttamente
   function onconnect(connection) {
+    // TODO: use addEdge inside addConnection
     // edges = addEdge(connection, edges);
+    d.addConnection(connection);
   }
 
   function exportToJson() {

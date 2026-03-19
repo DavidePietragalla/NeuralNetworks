@@ -19,6 +19,8 @@ class ENode {
 
 }
 
+class Configuration extends ENode { }
+
 
 
 class Layer extends ENode {
@@ -78,6 +80,12 @@ export class VisualizeNode {
   }
 }
 
+class Model {
+  public nodes: Array<ENode> = [];
+  public edges: Array<any> = [];
+
+}
+
 export class Diagram {
   public nodes: Array<VisualizeNode> = $state([]);
   public edges: Array<any> = $state([]);
@@ -91,8 +99,15 @@ export class Diagram {
     this.nodes = [...this.nodes, newNode];
   }
 
-  public addConnection() {
-    // aggiungi in self.edges  la connesion per avere la visuliazzazione
-    // aggiungi la connesione dei layer
+  public loadModel(model: Model) {
+    // Deallocare i nodi visualizzati
+    // Carica nodes , quindi istanzia VisualizeNode node
   }
+
+  public addConnection(conn: any) {
+
+    console.log(conn.valueOf());
+    this.edges = [...this.edges, conn];
+  }
+
 }
