@@ -18,11 +18,13 @@ export abstract class ENode {
   public static allNodes: Record<string, ENode> = {};
 
   public id: string;
+  private hyperparameters: Array<Hyperparameter>
 
   constructor() {
     this.id = "ENode_" + ENode.counter++;
     if (ENode.allNodes[this.id] !== undefined) throw Error("node with id " + this.id + "exists");
     ENode.allNodes[this.id] = this;
+    this.hyperparameters = [];
   }
 
   public static fromId(id: string): ENode {
@@ -52,10 +54,27 @@ export class VNode {
   }
 }
 
+export class ActivationFunction extends ENode {
+  public static istances: number = 0;
+  public name: string;
+
+  constructor(name: string | null = null) {
+    super();
+    Layer.instances++;
+    if (name === null) {
+      name = "acti_f_" + (Layer.instances);
+    }
+    this.name = name;
+  }
+
+  public getType(): string {
+    return "activationFunction";
+  }
+}
+
 export class Layer extends ENode {
   public static instances: number = 0;
   public name: string
-  private hyperparameters: Array<Hyperparameter>
 
   constructor(name: string | null = null) {
     super();
@@ -69,7 +88,6 @@ export class Layer extends ENode {
     // cosi l'utente puo aggiungere layer che noi non abbiamo implementato.
     // Per questa ragione dentro il costruttore bisognera implementare il recupero degli
     // hyperparameters e inizializzarli con un valore di default.
-    this.hyperparameters = [];
   }
 
   public getType(): string {
@@ -90,6 +108,12 @@ export class Diagram {
   public addLayer() {
     const l = new Layer();
     const n = new VNode(l);
+    this.nodes = [...this.nodes, n];
+  }
+
+  public addActivationFunction() {
+    const a = new ActivationFunction();
+    const n = new VNode(a);
     this.nodes = [...this.nodes, n];
   }
 

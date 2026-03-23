@@ -9,7 +9,7 @@
 
   import "@xyflow/svelte/dist/style.css";
 
-  import { Diagram, ENode, Layer } from "$lib/utils.svelte";
+  import { ActivationFunction, Diagram, ENode, Layer } from "$lib/utils.svelte";
 
   // SVELTE 5: Usiamo $state al posto di writable
   // let nodes = $state([]);
@@ -96,15 +96,23 @@
     importFromJson(dummyJson);
   }
 
+  function addActivationFunction() {
+    d.addActivationFunction();
+  }
+
   // GESTIONE DELLA PAGINA
   import SLayer from "../lib/components/SLayer.svelte";
+  import SActivationFunction from "$lib/components/SActivationFunction.svelte";
 
-  const nodeTypes = { layer: SLayer };
+  const nodeTypes = { layer: SLayer, activationFunction: SActivationFunction };
 </script>
 
 <div class="app-container">
   <div class="toolbar">
     <button onclick={addLayer}>➕ Aggiungi Layer</button>
+    <button onclick={addActivationFunction}>
+      ➕ Aggiungi Activation Function
+    </button>
     <button
       onclick={deleteSelectedNode}
       disabled={!selectedId}

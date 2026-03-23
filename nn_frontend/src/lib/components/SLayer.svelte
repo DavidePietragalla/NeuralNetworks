@@ -10,7 +10,7 @@
   let l: Layer = $derived(ENode.fromId(data.enode as string)) as Layer;
 
   function handleInternalClick() {
-    console.log(`Node ${id} was clicked!`);
+    console.log(`Layer ${id} was clicked!`);
   }
 
   // Add a keyboard handler for accessibility
