@@ -4,7 +4,6 @@
     Controls,
     Background,
     BackgroundVariant,
-    addEdge,
   } from "@xyflow/svelte";
 
   import "@xyflow/svelte/dist/style.css";
@@ -103,8 +102,10 @@
   // GESTIONE DELLA PAGINA
   import SLayer from "../lib/components/SLayer.svelte";
   import SActivationFunction from "$lib/components/SActivationFunction.svelte";
+  import SConnection from "$lib/components/SConnection.svelte";
 
   const nodeTypes = { layer: SLayer, activationFunction: SActivationFunction };
+  const edgeTypes = { connection: SConnection };
 </script>
 
 <div class="app-container">
@@ -126,11 +127,13 @@
   <div class="flow-wrapper">
     <SvelteFlow
       bind:nodes={d.nodes}
-      bind:edges={d.edges}
+      edges={d.edges}
       {nodeTypes}
+      {edgeTypes}
       fitView
       onnodeclick={handleNodeClick}
       onpaneclick={handlePaneClick}
+      {onconnect}
     >
       <Controls />
       <Background variant={BackgroundVariant.Dots} />
