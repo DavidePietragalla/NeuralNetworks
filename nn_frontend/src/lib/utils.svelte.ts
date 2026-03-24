@@ -53,12 +53,28 @@ export abstract class ENode {
 
 }
 
+class Stereotype {
+  public expr: string;
+
+  constructor(expr: string) {
+    this.expr = expr;
+  }
+}
+
 export abstract class Module extends ENode {
   public name: string
+  public expr: string = "";
+
+  public in_channels: number = 0;
+  public out_channels: number = 0;
 
   constructor(name: string) {
     super();
     this.name = name;
+  }
+
+  setStereotype(s: Stereotype) {
+    this.expr = s.expr;
   }
 }
 
