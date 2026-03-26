@@ -44,9 +44,20 @@ export class Diagram {
   }
 
   public deleteNode(id: string) {
+
+
+    let old_edges = this.edges.filter(edge => edge.source !== id && edge.target === id);
+    old_edges.forEach(edge => {
+      let source = ENode.fromId(edge.source);
+      let target = ENode.fromId(edge.target);
+      if (source === undefined || target === undefined) throw Error("the source or targer are undefined");
+      source.remove_next_node(target);
+    });
+
+    ENode.removeId(id);
+
     this.nodes = this.nodes.filter(node => node.id !== id);
     this.edges = this.edges.filter(edge => edge.source !== id && edge.target !== id);
-    ENode.removeId(id);
   }
 
 }

@@ -18,6 +18,7 @@ export class Module extends ENode {
     if (name === null) {
       name = type + "_" + Module.counter
     }
+    Module.counter++;
     this.name = name;
     this.type = type;
   }

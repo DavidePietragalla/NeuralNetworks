@@ -16,12 +16,12 @@ export class VConnection {
 
     this.markerEnd = {
       type: MarkerType.ArrowClosed,
-      width: 20,
-      height: 20,
-      color: '#FF0072',
+      width: 10,
+      height: 15,
+      color: '#27b376',
     };
 
-    this.style = 'stroke: #FF0072; stroke-width: 2;';
+    this.style = 'stroke: #27b376; stroke-width: 2;';
   }
 
 }
