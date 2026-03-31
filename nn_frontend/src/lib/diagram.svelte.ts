@@ -9,16 +9,25 @@ export class Diagram {
   public nodes: Array<VNode> = $state([]);
   public edges: Array<any> = $state([]);
 
-constructor() {
-  const moduleFiles = import.meta.glob('./Modules/*.json', { eager: true });
+  constructor() {
+    const moduleFiles = import.meta.glob('./Modules/*.json', { eager: true });
 
-  console.log("Files found:", Object.keys(moduleFiles));
+    console.log("Files found:", Object.keys(moduleFiles));
 
-  this.stereotypes = Object.entries(moduleFiles).map(([path, data]) => {
-    const content = (data as any).default || data;
-    return new Stereotype(path, content);
-  });
-}
+    this.stereotypes = Object.entries(moduleFiles).map(([path, data]) => {
+      const content = (data as any).default || data;
+      return new Stereotype(path, content);
+    });
+  }
+
+  public addModule(stereotype: Stereotype | string) {
+    if (typeof stereotype === 'string') return
+    console.log(stereotype.getName())
+    // TODO:
+    const m = new Module(stereotype);
+    const n = new VNode(m);
+    this.nodes = [...this.nodes, n];
+  }
 
   public addLayer() {
     const l = new Module("layer");
