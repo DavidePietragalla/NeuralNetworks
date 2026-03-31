@@ -37,10 +37,16 @@
 >
   <Handle type="target" position={Position.Top} />
 
+  <!-- <div> -->
+  <!--   [{l.in_channels}] -->
+  <!-- </div> -->
+
   <div class="node-label">
     {l.name}
   </div>
-
+  <!-- <div> -->
+  <!--   [{l.out_channels}] -->
+  <!-- </div> -->
   <Handle type="source" position={Position.Bottom} />
 </div>
 
