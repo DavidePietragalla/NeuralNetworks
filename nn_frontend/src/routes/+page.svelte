@@ -14,6 +14,8 @@
   import { Diagram } from "$lib/diagram.svelte";
   import { ENode } from "$lib/model/node";
 
+  import SDropdown from "$lib/components/SDropdown.svelte";
+
   // SVELTE 5: Usiamo $state al posto di writable
   // let nodes = $state([]);
   // let edges = $state([]);
@@ -29,16 +31,6 @@
   // --- FUNZIONI CORE ---
 
   function addLayer() {
-    // const newNode = new Layer(`Layer ${layerCounter - 1}`);
-    // layerCounter++;
-    // const newNode = {
-    //   id: generateId(),
-    //   type: "default",
-    //   position: { x: Math.random() * 250, y: Math.random() * 250 },
-    //   data: { label: `Layer ${layerCounter - 1}` },
-    // };
-    // // In Svelte 5 possiamo riassegnare direttamente l'array
-    // nodes = [...nodes, newNode];
     d.addLayer();
   }
 
@@ -106,7 +98,7 @@
 
   // GESTIONE DELLA PAGINA
 
-  const nodeTypes = { layer: SLayer, activationFunction: SActivationFunction };
+  const nodeTypes = { Linear: SLayer, activationFunction: SActivationFunction };
   const edgeTypes = { connection: SConnection };
 </script>
 
@@ -124,6 +116,7 @@
     <div class="divider"></div>
     <button onclick={exportToJson}>💾 Esporta JSON</button>
     <button onclick={testImport}>📂 Testa Import JSON</button>
+    <SDropdown diagram={d}></SDropdown>
   </div>
 
   <div class="flow-wrapper">
