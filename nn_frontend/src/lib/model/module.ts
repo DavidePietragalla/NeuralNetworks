@@ -1,5 +1,11 @@
 
 import { ENode } from "./node";
+import type { Stereotype } from "./stereotype";
+
+export interface IstanceParameter {
+  type: string; // python type
+  value: string;
+}
 
 export class Module extends ENode {
 
@@ -10,21 +16,24 @@ export class Module extends ENode {
 
   public type: string;
 
-  public in_channels: number = 0;
-  public out_channels: number = 0;
+  public params: Array<IstanceParameter> = new Array();
+  public stereotypeName: string = "";
 
-  constructor(type: string, name: string | null = null) {
+  public stereotype: Stereotype;
+
+  constructor(stereotype: Stereotype, name: string | null = null) {
     super();
     if (name === null) {
-      name = type + "_" + Module.counter
+      name = stereotype.getName() + "_" + Module.counter
     }
     Module.counter++;
     this.name = name;
-    this.type = type;
-  }
-
-  setStereotype(s: Stereotype) {
-    this.expr = s.getExpr();
+    this.type = stereotype.category;
+    for (const [key, value] of Object.entries(stereotype.parameters)) {
+      if (key === "in_channels")
+        console.log(key, value);
+      // this.params.push()
+    }
   }
 
   getType(): string {
