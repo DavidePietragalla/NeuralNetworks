@@ -15,6 +15,7 @@
   import { ENode } from "$lib/model/node";
 
   import SDropdown from "$lib/components/SDropdown.svelte";
+  import SIstantiator from "$lib/components/SIstantiator.svelte";
 
   // SVELTE 5: Usiamo $state al posto di writable
   // let nodes = $state([]);
@@ -26,6 +27,7 @@
   // L'elemento cliccato va evidenziato.
   let selectedId = $state<string | null>(null);
 
+  let istantiate: boolean = $state(false);
   let d = new Diagram();
 
   // --- FUNZIONI CORE ---
@@ -96,6 +98,10 @@
     d.addActivationFunction();
   }
 
+  function closeModal() {
+    istantiate = false;
+  }
+
   // GESTIONE DELLA PAGINA
 
   const nodeTypes = { Linear: SLayer, activationFunction: SActivationFunction };
@@ -104,10 +110,12 @@
 
 <div class="app-container">
   <div class="toolbar">
-    <button onclick={addLayer}>➕ Aggiungi Layer</button>
-    <button onclick={addActivationFunction}>
-      ➕ Aggiungi Activation Function
-    </button>
+    <button
+      onclick={(e) => {
+        e.stopPropagation();
+        istantiate = true;
+      }}>➕ Aggiungi Module</button
+    >
     <button
       onclick={deleteSelectedNode}
       disabled={!selectedId}
@@ -116,7 +124,6 @@
     <div class="divider"></div>
     <button onclick={exportToJson}>💾 Esporta JSON</button>
     <button onclick={testImport}>📂 Testa Import JSON</button>
-    <SDropdown diagram={d}></SDropdown>
   </div>
 
   <div class="flow-wrapper">
@@ -135,6 +142,18 @@
     </SvelteFlow>
   </div>
 </div>
+
+{#if istantiate}
+  <div class="modal-overlay" role="dialog">
+    <div class="modal-container">
+      <div class="modal-body">
+        <SIstantiator diagram={d} onSuccess={closeModal} />
+      </div>
+
+      <button class="btn-close" onclick={closeModal}> Chiudi </button>
+    </div>
+  </div>
+{/if}
 
 <style>
   @import "../lib/styles/page.css";

@@ -2,7 +2,8 @@
 import { ENode } from "./node";
 import type { Stereotype } from "./stereotype";
 
-export interface IstanceParameter {
+export interface InstanceParameter {
+  name: string
   type: string; // python type
   value: string;
 }
@@ -14,29 +15,38 @@ export class Module extends ENode {
   public name: string
   public expr: string = "";
 
-  public type: string;
-
-  public params: Array<IstanceParameter> = new Array();
+  public params: Array<InstanceParameter> = [];
   public stereotypeName: string = "";
 
   public stereotype: Stereotype;
 
-  constructor(stereotype: Stereotype, name: string | null = null) {
+  constructor(stereotype: Stereotype, name: string | null = null, valueToSave: Record<string, string>) {
     super();
-    if (name === null) {
-      name = stereotype.getName() + "_" + Module.counter
+
+    if (!name || name.trim() === "") {
+      name = `${stereotype.getName()}_${Module.counter}`;
     }
+
     Module.counter++;
+
     this.name = name;
-    this.type = stereotype.category;
-    for (const [key, value] of Object.entries(stereotype.parameters)) {
-      if (key === "in_channels")
-        console.log(key, value);
-      // this.params.push()
+    this.stereotype = stereotype;
+    this.stereotypeName = stereotype.getName();
+
+    for (const [key, paramDef] of Object.entries(stereotype.parameters)) {
+      // Prendiamo il valore dal form (valueToSave). 
+      // Se per qualche motivo manca, facciamo un fallback sul valore di default dello stereotipo.
+      const userValue = valueToSave[key] !== undefined ? valueToSave[key] : paramDef.default;
+
+      this.params.push({
+        name: key,                 // Es: 'in_channels'
+        type: paramDef.type,       // Es: 'int'
+        value: String(userValue)
+      });
     }
   }
 
   getType(): string {
-    return this.type;
+    return this.stereotype.category;
   }
 }

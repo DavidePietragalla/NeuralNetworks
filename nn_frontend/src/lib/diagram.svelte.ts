@@ -20,11 +20,10 @@ export class Diagram {
     });
   }
 
-  public addModule(stereotype: Stereotype | string) {
-    if (typeof stereotype === 'string') return
+  public addModule(stereotype: Stereotype | null, name: string | null = null, valueToSave: Record<string, string> | null = null) {
+    if (stereotype === null) return;
     console.log(stereotype.getName())
-    // TODO:
-    const m = new Module(stereotype);
+    const m = new Module(stereotype, name, valueToSave);
     const n = new VNode(m);
     this.nodes = [...this.nodes, n];
   }

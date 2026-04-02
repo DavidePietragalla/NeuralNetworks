@@ -25,21 +25,11 @@ export class Stereotype {
   public getName(): string {
     if (!this.file_path) return '';
 
-    // Normalize slashes to handle both Windows (\) and Unix (/) paths
-    const normalizedPath = this.file_path.replace(/\\/g, '/');
+    const fileWithExt = this.file_path.split(/[\\/]/).pop() || '';
 
-    // Grab just the final part of the path
-    const fileWithExt = normalizedPath.split('/').pop() || '';
-
-    // Find the last dot to remove the extension
     const lastDotIndex = fileWithExt.lastIndexOf('.');
 
-    // Return the name (checks > 0 so it doesn't break on hidden files like .env)
-    if (lastDotIndex > 0) {
-      return fileWithExt.substring(0, lastDotIndex);
-    }
-
-    return fileWithExt;
+    return lastDotIndex > 0 ? fileWithExt.substring(0, lastDotIndex) : fileWithExt;
   }
 
   public getExpr(): string {

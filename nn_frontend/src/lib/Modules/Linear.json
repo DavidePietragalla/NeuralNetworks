@@ -5,23 +5,23 @@
   "params": {
     "in_features": {
       "type": "int",
-      "default":"Undefined"
+      "default": "Undefined"
     },
     "out_features": {
       "type": "int",
-      "default":"Undefined"
+      "default": "Undefined"
     },
     "bias": {
       "type": "bool",
-      "default":"True"
+      "default": "True"
     },
     "device": {
       "type": "str",
-      "default":"None"
+      "default": "None"
     },
     "dtype": {
       "type": "str",
-      "default":"None"
+      "default": "None"
     }
   }
 }
