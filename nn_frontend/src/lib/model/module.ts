@@ -50,6 +50,6 @@ export class Module extends ENode {
   }
 
   getType(): string {
-    return "Linear";
+    return "Module";
   }
 }

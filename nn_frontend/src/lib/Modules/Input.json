@@ -1,0 +1,15 @@
+{
+  "category": "Input",
+  "pythonClassName": "None",
+  "view": {
+    "color": "#27b376",
+    "width": 100,
+    "height": 60
+  },
+  "params": {
+    "out_features": {
+      "type": "int",
+      "default": "768"
+    }
+  }
+}

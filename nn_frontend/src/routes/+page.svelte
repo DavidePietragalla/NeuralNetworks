@@ -9,28 +9,16 @@
   import "@xyflow/svelte/dist/style.css";
 
   import SLayer from "../lib/components/SLayer.svelte";
-  import SActivationFunction from "$lib/components/SActivationFunction.svelte";
   import SConnection from "$lib/components/SConnection.svelte";
   import { Diagram } from "$lib/diagram.svelte";
   import { ENode } from "$lib/model/node";
 
-  import SDropdown from "$lib/components/SDropdown.svelte";
   import SIstantiator from "$lib/components/SIstantiator.svelte";
 
-  // SVELTE 5: Usiamo $state al posto di writable
-  // let nodes = $state([]);
-  // let edges = $state([]);
-  //
-  // let layerCounter = 1;
-  // const generateId = () => `layer_${layerCounter++}`;
-
-  // L'elemento cliccato va evidenziato.
   let selectedId = $state<string | null>(null);
 
   let istantiate: boolean = $state(false);
   let d = new Diagram();
-
-  // --- FUNZIONI CORE ---
 
   function deleteSelectedNode() {
     if (selectedId) {
@@ -40,10 +28,7 @@
     }
   }
 
-  // SVELTE 5: I parametri degli eventi vengono passati direttamente
   function onconnect(connection: any) {
-    // TODO: use addEdge inside addConnection
-    // edges = addEdge(connection, edges);
     d.addConnection(connection);
   }
 
@@ -96,7 +81,7 @@
 
   // GESTIONE DELLA PAGINA
 
-  const nodeTypes = { Linear: SLayer, activationFunction: SActivationFunction };
+  const nodeTypes = { Module: SLayer };
   const edgeTypes = { connection: SConnection };
 </script>
 

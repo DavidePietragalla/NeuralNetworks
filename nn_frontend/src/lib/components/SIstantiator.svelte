@@ -10,17 +10,15 @@
 
   let { diagram, onSuccess }: Props = $props();
 
-  let name: string | null = $state(null);
+  let name: string = $state("");
   let selection: Stereotype | null = $state(null);
 
-  // 1. STATI PER LO STILE DEL NODO (aggiunto nodeHeight)
   let nodeColor: string = $state("#4779c4");
   let nodeWidth: number = $state(100);
   let nodeHeight: number = $state(60);
 
   let parameterValues: Record<string, string> = $state({});
 
-  // 2. QUI AVVIENE LA MAGIA: Quando cambia 'selection', aggiorniamo i valori!
   $effect(() => {
     if (selection) {
       let initialValues: Record<string, string> = {};
@@ -29,18 +27,25 @@
       }
       parameterValues = initialValues;
 
-      // ---- PEZZO CHE MANCAVA ----
-      // Se lo stereotipo ha una "view" definita nel JSON, sovrascriviamo gli stati
       if (selection.view) {
         nodeColor = selection.view.color;
         nodeWidth = selection.view.width;
         nodeHeight = selection.view.height;
       }
-      // ---------------------------
     } else {
       parameterValues = {};
     }
   });
+
+  function resetForm() {
+    name = "";
+    selection = null;
+    // Il reset di selection farà scattare l'$effect che pulisce parameterValues,
+    // ma ripristiniamo anche i valori di default della view per sicurezza.
+    nodeColor = "#4779c4";
+    nodeWidth = 100;
+    nodeHeight = 60;
+  }
 
   function handleSubmit(event: Event) {
     event.preventDefault();
@@ -51,19 +56,24 @@
     }
 
     const valuesToSave = $state.snapshot(parameterValues);
-
     const widthCssStr = `${nodeWidth}px`;
     const heightCssStr = `${nodeHeight}px`;
 
-    // 3. Aggiunto anche l'argomento heightCssStr!
+    // 3. Se la stringa è vuota, passiamo null per far attivare la logica
+    // di default dentro la classe Module (es: Linear_1, Conv2D_2)
+    const finalName = name.trim() === "" ? null : name;
+
     diagram.addModule(
       selection,
-      name,
+      finalName,
       valuesToSave,
       nodeColor,
       widthCssStr,
       heightCssStr,
     );
+
+    // 4. Svuotiamo il form per prepararlo a una nuova interazione
+    resetForm();
 
     if (onSuccess) {
       onSuccess();

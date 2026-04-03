@@ -30,3 +30,25 @@
   outline: 2px solid var(--node-bg-color, #4779c4);
   transform: scale(1.05);
 }
+
+.custom-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px; /* Un po' di respiro tra i testi */
+  }
+
+  /* Stile dedicato ai numerini in/out */
+  .features-label {
+    font-size: 0.7rem;
+    opacity: 0.85;
+    font-family: monospace; /* Opzionale, ma dà un look tecnico ai dati */
+    pointer-events: none; /* Evita che il testo interferisca con i click sul nodo */
+  }
+
+  .node-label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
