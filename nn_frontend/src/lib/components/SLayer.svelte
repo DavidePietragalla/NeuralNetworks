@@ -11,21 +11,29 @@
   let nodeWidth = $derived(data.width || "100px");
   let nodeHeight = $derived(data.height || "60px");
 
-  let isInput = $derived(l?.stereotype.category.toLowerCase() === "input");
-  let isLoss = $derived("loss" in l?.stereotype.category.toLowerCase());
+  let nodeName = $derived((data._tick, l?.name));
+  let isInput = $derived(
+    (data._tick, l?.stereotype.category.toLowerCase() === "input"),
+  );
+
+  let isLoss = $derived(
+    (data._tick, l?.stereotype.category.toLowerCase().includes("loss")),
+  );
 
   let inFeatures = $derived(
+    (data._tick,
     l?.params.find(
       (p) =>
         p.name === "in_features" ||
         p.name === "in_channels" ||
         p.name === "num_features",
-    )?.value,
+    )?.value),
   );
   let outFeatures = $derived(
+    (data._tick,
     l?.params.find(
       (p) => p.name === "out_features" || p.name === "out_channels",
-    )?.value,
+    )?.value),
   );
 
   function handleInternalClick() {
@@ -53,7 +61,7 @@
       <div class="uml-circle"></div>
 
       <div class="external-labels">
-        <span class="node-label">{l.name}</span>
+        <span class="node-label">{nodeName}</span>
         {#if outFeatures !== undefined}
           <span class="features-label">[{outFeatures}]</span>
         {/if}
@@ -72,7 +80,7 @@
         <div class="features-label">[{inFeatures}]</div>
       {/if}
 
-      <div class="node-label">{l.name}</div>
+      <div class="node-label">{nodeName}</div>
 
       {#if outFeatures !== undefined}
         <div class="features-label">[{outFeatures}]</div>
@@ -90,10 +98,8 @@
 
   .node-wrapper {
     position: relative;
-    /* Rimuove i bordi default di xyflow se presenti */
   }
 
-  /* Stili specifici per l'Input UML */
   .uml-input-container {
     display: flex;
     flex-direction: column;
@@ -104,7 +110,7 @@
   .uml-circle {
     width: 30px;
     height: 30px;
-    background-color: #333; /* Cerchietto nero stile UML */
+    background-color: #333;
     border-radius: 50%;
     border: 3px solid #222;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

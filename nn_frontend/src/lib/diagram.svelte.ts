@@ -82,4 +82,45 @@ export class Diagram {
     this.nodes = this.nodes.filter(node => node.id !== id);
     this.edges = this.edges.filter(edge => edge.source !== id && edge.target !== id);
   }
+
+  public updateModule(
+    id: string,
+    stereotype: Stereotype,
+    name: string | null = null,
+    valueToSave: Record<string, string> | null = null,
+    color?: string,
+    width?: string,
+    height?: string
+  ) {
+    const m = ENode.fromId(id) as Module;
+    if (!m) return;
+
+    m.stereotype = stereotype;
+    m.stereotypeName = stereotype.getName();
+    m.name = name || `${stereotype.getName()}_${id.split('_')[1]}`;
+
+    m.params = [];
+    if (valueToSave) {
+      for (const [key, paramDef] of Object.entries(stereotype.parameters)) {
+        const userValue = valueToSave[key] !== undefined ? valueToSave[key] : paramDef.default;
+        m.params.push({ name: key, type: paramDef.type, value: String(userValue) });
+      }
+    }
+
+    this.nodes = this.nodes.map(node => {
+      if (node.id === id) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            color: color || node.data.color,
+            width: width || node.data.width,
+            height: height || node.data.height,
+            _tick: Date.now()
+          }
+        } as VNode;
+      }
+      return node;
+    });
+  }
 }

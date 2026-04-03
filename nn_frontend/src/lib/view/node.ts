@@ -27,7 +27,8 @@ export class VNode {
       enode: node.id,
       color: color || "#4779c4", // Blue 
       width: width || "100px",
-      height: height || "60px"
+      height: height || "60px",
+      _tick: Date.now()
     };
   }
 }

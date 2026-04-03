@@ -2,13 +2,16 @@
   import SDropdown from "./SDropdown.svelte";
   import type { Diagram } from "$lib/diagram.svelte";
   import type { Stereotype } from "$lib/model/stereotype";
+  import { ENode } from "$lib/model/node";
+  import type { Module } from "$lib/model/module";
 
   interface Props {
     diagram: Diagram;
+    editNodeId?: string | null; // NUOVA PROP
     onSuccess?: () => void;
   }
 
-  let { diagram, onSuccess }: Props = $props();
+  let { diagram, editNodeId = null, onSuccess }: Props = $props();
 
   let name: string = $state("");
   let selection: Stereotype | null = $state(null);
@@ -19,29 +22,77 @@
 
   let parameterValues: Record<string, string> = $state({});
 
-  $effect(() => {
-    if (selection) {
-      let initialValues: Record<string, string> = {};
-      for (const [key, value] of Object.entries(selection.parameters)) {
-        initialValues[key] = value.default;
-      }
-      parameterValues = initialValues;
+  // Variabili per tracciare i cambiamenti senza finire in loop infiniti
+  let isEditing = $derived(editNodeId !== null);
+  let oldEditId: string | null = $state(null);
+  let oldSelection: Stereotype | null = $state(null);
 
-      if (selection.view) {
-        nodeColor = selection.view.color;
-        nodeWidth = selection.view.width;
-        nodeHeight = selection.view.height;
+  // EFFETTO 1: Popola il form quando viene passato un nodo da modificare
+  $effect(() => {
+    if (editNodeId !== oldEditId) {
+      oldEditId = editNodeId;
+
+      if (editNodeId) {
+        const m = ENode.fromId(editNodeId) as Module;
+        const vnode = diagram.nodes.find((n) => n.id === editNodeId);
+
+        if (m && vnode) {
+          name = m.name;
+          selection =
+            diagram.stereotypes.find((s) => s.getName() === m.stereotypeName) ||
+            null;
+          nodeColor = vnode.data.color;
+          nodeWidth = parseInt(vnode.data.width);
+          nodeHeight = parseInt(vnode.data.height);
+
+          let vals: Record<string, string> = {};
+          m.params.forEach((p) => {
+            vals[p.name] = p.value;
+          });
+          parameterValues = vals;
+        }
+      } else {
+        resetForm();
       }
-    } else {
-      parameterValues = {};
+    }
+  });
+
+  // EFFETTO 2: Gestisce i default se l'utente cambia manualmente lo stereotipo dal Dropdown
+  $effect(() => {
+    if (selection !== oldSelection) {
+      oldSelection = selection;
+
+      if (selection) {
+        // Applichiamo i default SOLO se stiamo creando, oppure se stiamo modificando
+        // ma l'utente ha deciso di cambiare lo stereotipo in corso d'opera.
+        const isSameAsEdited =
+          isEditing &&
+          editNodeId &&
+          (ENode.fromId(editNodeId) as Module)?.stereotypeName ===
+            selection.getName();
+
+        if (!isSameAsEdited) {
+          let initialValues: Record<string, string> = {};
+          for (const [key, value] of Object.entries(selection.parameters)) {
+            initialValues[key] = value.default;
+          }
+          parameterValues = initialValues;
+
+          if (selection.view) {
+            nodeColor = selection.view.color;
+            nodeWidth = selection.view.width;
+            nodeHeight = selection.view.height;
+          }
+        }
+      } else {
+        parameterValues = {};
+      }
     }
   });
 
   function resetForm() {
     name = "";
     selection = null;
-    // Il reset di selection farà scattare l'$effect che pulisce parameterValues,
-    // ma ripristiniamo anche i valori di default della view per sicurezza.
     nodeColor = "#4779c4";
     nodeWidth = 100;
     nodeHeight = 60;
@@ -56,23 +107,30 @@
     }
 
     const valuesToSave = $state.snapshot(parameterValues);
-    const widthCssStr = `${nodeWidth}px`;
-    const heightCssStr = `${nodeHeight}px`;
-
-    // 3. Se la stringa è vuota, passiamo null per far attivare la logica
-    // di default dentro la classe Module (es: Linear_1, Conv2D_2)
     const finalName = name.trim() === "" ? null : name;
 
-    diagram.addModule(
-      selection,
-      finalName,
-      valuesToSave,
-      nodeColor,
-      widthCssStr,
-      heightCssStr,
-    );
+    // BIVIO: Creazione vs Modifica
+    if (isEditing && editNodeId) {
+      diagram.updateModule(
+        editNodeId,
+        selection,
+        finalName,
+        valuesToSave,
+        nodeColor,
+        `${nodeWidth}px`,
+        `${nodeHeight}px`,
+      );
+    } else {
+      diagram.addModule(
+        selection,
+        finalName,
+        valuesToSave,
+        nodeColor,
+        `${nodeWidth}px`,
+        `${nodeHeight}px`,
+      );
+    }
 
-    // 4. Svuotiamo il form per prepararlo a una nuova interazione
     resetForm();
 
     if (onSuccess) {
@@ -139,7 +197,7 @@
           bind:value={parameterValues[key]}
         /><br /><br />
       {/each}
-      <input type="submit" value="Create" />
+      <input type="submit" value={isEditing ? "Update Node" : "Create Node"} />
     </form>
   {/if}
 </div>

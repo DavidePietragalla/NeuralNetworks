@@ -16,14 +16,16 @@
   import SIstantiator from "$lib/components/SIstantiator.svelte";
 
   let selectedId = $state<string | null>(null);
-
   let istantiate: boolean = $state(false);
+
+  // 1. NUOVO STATO: Ricorda quale nodo stiamo aprendo nella modale
+  let editTargetId = $state<string | null>(null);
+
   let d = new Diagram();
 
   function deleteSelectedNode() {
     if (selectedId) {
       d.deleteNode(selectedId);
-
       selectedId = null;
     }
   }
@@ -36,19 +38,24 @@
     selectedId = node.id;
   }
 
+  // 2. EXTRA UX: Aprire la modifica con un doppio click sul nodo!
+  function handleNodeDoubleClick({ event, node }: any) {
+    selectedId = node.id;
+    editTargetId = node.id;
+    istantiate = true;
+  }
+
   function handlePaneClick({ event }: any) {
     selectedId = null;
   }
 
   function exportToJson() {
-    // Rimuoviamo il prefisso '$' usato per i writable
     console.log(ENode.allNodes);
     const flowState = {
       model: Object.fromEntries(ENode.allNodes),
       view: { nodes: d.nodes, edges: d.edges },
     };
     const jsonString = JSON.stringify(flowState, null, 2);
-    // TODO: salva in un file
     console.log("JSON Esportato:", jsonString);
     alert("JSON generato! Guarda la console.");
     return jsonString;
@@ -75,11 +82,24 @@
     importFromJson(dummyJson);
   }
 
-  function closeModal() {
-    istantiate = false;
+  // 3. FUNZIONI PER GESTIRE L'APERTURA DELLA MODALE
+  function openCreateModal(e: Event) {
+    e.stopPropagation();
+    editTargetId = null; // Ci assicuriamo che sia null per la Creazione
+    istantiate = true;
   }
 
-  // GESTIONE DELLA PAGINA
+  function openEditModal() {
+    if (selectedId) {
+      editTargetId = selectedId; // Impostiamo l'ID da Modificare
+      istantiate = true;
+    }
+  }
+
+  function closeModal() {
+    istantiate = false;
+    editTargetId = null; // Pulizia quando si chiude
+  }
 
   const nodeTypes = { Module: SLayer };
   const edgeTypes = { connection: SConnection };
@@ -87,17 +107,20 @@
 
 <div class="app-container">
   <div class="toolbar">
+    <button onclick={openCreateModal}>➕ Aggiungi Module</button>
+
     <button
-      onclick={(e) => {
-        e.stopPropagation();
-        istantiate = true;
-      }}>➕ Aggiungi Module</button
+      onclick={openEditModal}
+      disabled={!selectedId}
+      class:active={selectedId !== null}>✏️ Modifica</button
     >
+
     <button
       onclick={deleteSelectedNode}
       disabled={!selectedId}
       class:danger={selectedId !== null}>❌ Elimina</button
     >
+
     <div class="divider"></div>
     <button onclick={exportToJson}>💾 Esporta JSON</button>
     <button onclick={testImport}>📂 Testa Import JSON</button>
@@ -111,6 +134,7 @@
       {edgeTypes}
       fitView
       onnodeclick={handleNodeClick}
+      onnodedoubleclick={handleNodeDoubleClick}
       onpaneclick={handlePaneClick}
       {onconnect}
     >
@@ -124,7 +148,11 @@
   <div class="modal-overlay" role="dialog">
     <div class="modal-container">
       <div class="modal-body">
-        <SIstantiator diagram={d} onSuccess={closeModal} />
+        <SIstantiator
+          diagram={d}
+          editNodeId={editTargetId}
+          onSuccess={closeModal}
+        />
       </div>
 
       <button class="btn-close" onclick={closeModal}> Chiudi </button>

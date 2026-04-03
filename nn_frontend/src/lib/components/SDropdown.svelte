@@ -11,7 +11,7 @@
 </script>
 
 <select name="stereotypes" id="stereotypes" bind:value={selectedStereotype}>
-  <option value="null" selected>-- aggiungi layer --</option>
+  <option value={null} selected>-- aggiungi layer --</option>
   {#each diagram.stereotypes as stereotype}
     <option value={stereotype}>
       {stereotype.getName()}
