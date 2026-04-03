@@ -11,16 +11,20 @@ export class Diagram {
 
   constructor() {
     const moduleFiles = import.meta.glob('./Modules/*.json', { eager: true });
-
-    console.log("Files found:", Object.keys(moduleFiles));
-
     this.stereotypes = Object.entries(moduleFiles).map(([path, data]) => {
       const content = (data as any).default || data;
       return new Stereotype(path, content);
     });
+
+    // Cerca lo stereotipo Input e crea il nodo iniziale
+    const inputStereotype = this.stereotypes.find(s => s.category.toLowerCase() === "input");
+    if (inputStereotype) {
+      // Lo posizioniamo forzatamente in x: 250, y: 50
+      this.addModule(inputStereotype, "Input_0", null, undefined, undefined, undefined, 250, 50);
+    }
   }
 
-  // Modificato per accettare color e width
+  // Aggiunti i parametri opzionali x e y
   public addModule(
     stereotype: Stereotype | null,
     name: string | null = null,
@@ -28,15 +32,14 @@ export class Diagram {
     color?: string,
     width?: string,
     height?: string,
+    x: number | null = null,
+    y: number | null = null
   ) {
     if (stereotype === null) return;
-    console.log(stereotype.getName());
 
-    // Passiamo un oggetto vuoto in caso valueToSave sia null
     const m = new Module(stereotype, name, valueToSave || {});
-
-    // Generiamo il nodo visivo passando i nuovi parametri
-    const n = new VNode(m, null, null, color, width, height);
+    // Passiamo le coordinate al VNode
+    const n = new VNode(m, x, y, color, width, height);
     this.nodes = [...this.nodes, n];
   }
 
