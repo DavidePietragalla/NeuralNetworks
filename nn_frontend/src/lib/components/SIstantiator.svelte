@@ -13,10 +13,14 @@
   let name: string | null = $state(null);
   let selection: Stereotype | null = $state(null);
 
-  // 1. Nuovo stato per memorizzare i valori dei parametri inseriti dall'utente
+  // 1. STATI PER LO STILE DEL NODO (aggiunto nodeHeight)
+  let nodeColor: string = $state("#4779c4");
+  let nodeWidth: number = $state(100);
+  let nodeHeight: number = $state(60);
+
   let parameterValues: Record<string, string> = $state({});
 
-  // 2. Quando l'utente sceglie un nuovo stereotipo, popoliamo il dizionario con i valori di default
+  // 2. QUI AVVIENE LA MAGIA: Quando cambia 'selection', aggiorniamo i valori!
   $effect(() => {
     if (selection) {
       let initialValues: Record<string, string> = {};
@@ -24,12 +28,20 @@
         initialValues[key] = value.default;
       }
       parameterValues = initialValues;
+
+      // ---- PEZZO CHE MANCAVA ----
+      // Se lo stereotipo ha una "view" definita nel JSON, sovrascriviamo gli stati
+      if (selection.view) {
+        nodeColor = selection.view.color;
+        nodeWidth = selection.view.width;
+        nodeHeight = selection.view.height;
+      }
+      // ---------------------------
     } else {
       parameterValues = {};
     }
   });
 
-  // 3. Aggiungiamo l'oggetto event per prevenire il ricaricamento della pagina
   function handleSubmit(event: Event) {
     event.preventDefault();
 
@@ -38,11 +50,20 @@
       return;
     }
 
-    // Ora puoi passare sia i metadati (selection, name) che le istanze dei parametri (parameterValues)
-    // Usiamo $state.snapshot per passare un oggetto JS "pulito" al diagramma, rimuovendo il proxy reattivo di Svelte
     const valuesToSave = $state.snapshot(parameterValues);
 
-    diagram.addModule(selection, name, valuesToSave);
+    const widthCssStr = `${nodeWidth}px`;
+    const heightCssStr = `${nodeHeight}px`;
+
+    // 3. Aggiunto anche l'argomento heightCssStr!
+    diagram.addModule(
+      selection,
+      name,
+      valuesToSave,
+      nodeColor,
+      widthCssStr,
+      heightCssStr,
+    );
 
     if (onSuccess) {
       onSuccess();
@@ -56,10 +77,46 @@
     <input type="text" bind:value={name} class="w-full" />
   </div>
 
-  <br /><br />
+  <br />
+
+  <div style="display: flex; gap: 15px;">
+    <div style="flex: 1;">
+      <p class="text-sm font-medium! mb-1">Color</p>
+      <input
+        type="color"
+        bind:value={nodeColor}
+        style="width: 100%; height: 30px; cursor: pointer;"
+      />
+    </div>
+
+    <div style="flex: 1;">
+      <p class="text-sm font-medium! mb-1">Width (px)</p>
+      <input
+        type="number"
+        bind:value={nodeWidth}
+        min="50"
+        max="500"
+        style="width: 100%; height: 30px; box-sizing: border-box;"
+      />
+    </div>
+
+    <div style="flex: 1;">
+      <p class="text-sm font-medium! mb-1">Height (px)</p>
+      <input
+        type="number"
+        bind:value={nodeHeight}
+        min="30"
+        max="500"
+        style="width: 100%; height: 30px; box-sizing: border-box;"
+      />
+    </div>
+  </div>
+
+  <br />
 
   <SDropdown {diagram} bind:selectedStereotype={selection}></SDropdown>
-  <br /><br />
+
+  <br />
 
   {#if selection !== null}
     <form onsubmit={handleSubmit}>

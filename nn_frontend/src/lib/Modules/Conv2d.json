@@ -2,6 +2,11 @@
   "category": "Conv2d",
   "pythonClassName": "nn.Conv2d",
   "expr": "",
+  "view": {
+    "color": "#20b2aa",
+    "width": 140,
+    "height": 60
+  },
   "params": {
     "in_channels": {
       "type": "int",

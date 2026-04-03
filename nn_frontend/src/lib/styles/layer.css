@@ -1,12 +1,22 @@
-/* Give the node a shape, background, and border so it's visible! */
+/* layer.css */
 .custom-node {
   padding: 15px 20px;
-  background: #4779c4;
+  /* Usiamo var() per richiamare la variabile inline, con fallback a #4779c4 */
+  background: var(--node-bg-color, #4779c4);
   border: 2px solid #2c456b;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 100px;
+  /* Usiamo var() per la grandezza */
   text-align: center;
+  min-width: var(--node-min-width, 100px);
+  min-height: var(--node-min-height, 60px); /* <-- Aggiunta l'altezza */
+  
+  /* Centriamo il testo verticalmente e orizzontalmente se l'altezza cambia */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .node-label {
@@ -16,6 +26,7 @@
 
 .custom-node.selected {
   border-color: white;
-  outline: 2px solid #4779c4;
+  /* Se vuoi, puoi far diventare l'outline dello stesso colore del nodo! */
+  outline: 2px solid var(--node-bg-color, #4779c4);
   transform: scale(1.05);
 }

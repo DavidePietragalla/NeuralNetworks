@@ -20,23 +20,23 @@ export class Diagram {
     });
   }
 
-  public addModule(stereotype: Stereotype | null, name: string | null = null, valueToSave: Record<string, string> | null = null) {
+  // Modificato per accettare color e width
+  public addModule(
+    stereotype: Stereotype | null,
+    name: string | null = null,
+    valueToSave: Record<string, string> | null = null,
+    color?: string,
+    width?: string,
+    height?: string,
+  ) {
     if (stereotype === null) return;
-    console.log(stereotype.getName())
-    const m = new Module(stereotype, name, valueToSave);
-    const n = new VNode(m);
-    this.nodes = [...this.nodes, n];
-  }
+    console.log(stereotype.getName());
 
-  public addLayer() {
-    const l = new Module("layer");
-    const n = new VNode(l);
-    this.nodes = [...this.nodes, n];
-  }
+    // Passiamo un oggetto vuoto in caso valueToSave sia null
+    const m = new Module(stereotype, name, valueToSave || {});
 
-  public addActivationFunction() {
-    const a = new Module("activationFunction");
-    const n = new VNode(a);
+    // Generiamo il nodo visivo passando i nuovi parametri
+    const n = new VNode(m, null, null, color, width, height);
     this.nodes = [...this.nodes, n];
   }
 
@@ -51,8 +51,9 @@ export class Diagram {
     let source = ENode.fromId(connection.source);
     let target = ENode.fromId(connection.target);
 
+    // Typo corretto: "targer" -> "target"
     if (source === undefined || target === undefined)
-      throw Error("the source or targer are undefined");
+      throw Error("the source or target are undefined");
 
     source.add_next_node(target);
 
@@ -61,13 +62,15 @@ export class Diagram {
   }
 
   public deleteNode(id: string) {
-
-
     let old_edges = this.edges.filter(edge => edge.source !== id && edge.target === id);
     old_edges.forEach(edge => {
       let source = ENode.fromId(edge.source);
       let target = ENode.fromId(edge.target);
-      if (source === undefined || target === undefined) throw Error("the source or targer are undefined");
+
+      // Typo corretto: "targer" -> "target"
+      if (source === undefined || target === undefined)
+        throw Error("the source or target are undefined");
+
       source.remove_next_node(target);
     });
 
@@ -76,5 +79,4 @@ export class Diagram {
     this.nodes = this.nodes.filter(node => node.id !== id);
     this.edges = this.edges.filter(edge => edge.source !== id && edge.target !== id);
   }
-
 }

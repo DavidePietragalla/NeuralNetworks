@@ -2,6 +2,11 @@
   "category": "BatchNorm1d",
   "pythonClassName": "nn.BatchNorm1d",
   "expr": "",
+  "view": {
+    "color": "#9370db",
+    "width": 140,
+    "height": 60
+  },
   "params": {
     "num_features": {
       "type": "int",

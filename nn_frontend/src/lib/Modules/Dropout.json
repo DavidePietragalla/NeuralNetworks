@@ -2,6 +2,11 @@
   "category": "Dropout",
   "pythonClassName": "nn.Dropout",
   "expr": "",
+  "view": {
+    "color": "#a9a9a9",
+    "width": 100,
+    "height": 50
+  },
   "params": {
     "p": {
       "type": "float",

@@ -2,6 +2,11 @@
   "category": "Transformer",
   "pythonClassName": "nn.Transformer",
   "expr": "",
+  "view": {
+    "color": "#8a2be2",
+    "width": 220,
+    "height": 80
+  },
   "params": {
     "d_model": {
       "type": "int",

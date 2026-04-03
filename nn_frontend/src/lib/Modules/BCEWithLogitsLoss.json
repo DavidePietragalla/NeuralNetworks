@@ -2,6 +2,11 @@
   "category": "BCEWithLogitsLoss",
   "pythonClassName": "nn.BCEWithLogitsLoss",
   "expr": "",
+  "view": {
+    "color": "#cd5c5c",
+    "width": 160,
+    "height": 60
+  },
   "params": {
     "weight": {
       "type": "Tensor",

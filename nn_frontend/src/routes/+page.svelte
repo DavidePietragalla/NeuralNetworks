@@ -32,10 +32,6 @@
 
   // --- FUNZIONI CORE ---
 
-  function addLayer() {
-    d.addLayer();
-  }
-
   function deleteSelectedNode() {
     if (selectedId) {
       d.deleteNode(selectedId);
@@ -92,10 +88,6 @@
   function testImport() {
     const dummyJson = `{"nodes":[{"id":"layer_1","type":"default","position":{"x":100,"y":100},"data":{"label":"Input Layer"}}],"edges":[]}`;
     importFromJson(dummyJson);
-  }
-
-  function addActivationFunction() {
-    d.addActivationFunction();
   }
 
   function closeModal() {

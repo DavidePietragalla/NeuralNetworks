@@ -2,6 +2,11 @@
   "category": "MultiheadAttention",
   "pythonClassName": "nn.MultiheadAttention",
   "expr": "",
+  "view": {
+    "color": "#8a2be2",
+    "width": 220,
+    "height": 80
+  },
   "params": {
     "embed_dim": {
       "type": "int",

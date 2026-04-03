@@ -2,6 +2,11 @@
   "category": "LayerNorm",
   "pythonClassName": "nn.LayerNorm",
   "expr": "",
+  "view": {
+    "color": "#9370db",
+    "width": 140,
+    "height": 60
+  },
   "params": {
     "normalized_shape": {
       "type": "int | tuple",

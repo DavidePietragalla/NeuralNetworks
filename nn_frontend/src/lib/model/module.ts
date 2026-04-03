@@ -20,9 +20,12 @@ export class Module extends ENode {
 
   public stereotype: Stereotype;
 
-  constructor(stereotype: Stereotype, name: string | null = null, valueToSave: Record<string, string>) {
+  constructor(stereotype: Stereotype, name: string | null = null, valueToSave: Record<string, string> | null) {
     super();
 
+    if (valueToSave === null) {
+      valueToSave = {};
+    }
     if (!name || name.trim() === "") {
       name = `${stereotype.getName()}_${Module.counter}`;
     }
@@ -47,6 +50,6 @@ export class Module extends ENode {
   }
 
   getType(): string {
-    return this.stereotype.category;
+    return "Linear";
   }
 }

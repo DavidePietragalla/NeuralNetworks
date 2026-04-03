@@ -4,22 +4,21 @@ export interface ModuleParameter {
 }
 
 export class Stereotype {
+
   public file_path: string;
-  public category: string = "";
-  public pythonClassName: string = "";
-  public expr: string = "";
-  public parameters: Record<string, ModuleParameter> = {};
+  public category: string;
+  public pythonClassName: string;
+  public expr: string;
+  public parameters: Record<string, ModuleParameter>;
+  public view: { color: string; width: number; height: number };
 
   constructor(file_path: string, data: any) {
     this.file_path = file_path;
-    this.loadFromData(data);
-  }
-
-  private loadFromData(data: any): void {
     this.category = data.category || "";
     this.pythonClassName = data.pythonClassName || "";
     this.expr = data.expr || "";
     this.parameters = data.params || {};
+    this.view = data.view || { color: "#4779c4", width: 100, height: 60 };
   }
 
   public getName(): string {

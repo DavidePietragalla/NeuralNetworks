@@ -2,6 +2,11 @@
   "category": "Flatten",
   "pythonClassName": "nn.Flatten",
   "expr": "",
+  "view": {
+    "color": "#a9a9a9",
+    "width": 100,
+    "height": 50
+  },
   "params": {
     "start_dim": {
       "type": "int",

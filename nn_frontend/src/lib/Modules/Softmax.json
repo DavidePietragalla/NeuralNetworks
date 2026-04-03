@@ -2,6 +2,11 @@
   "category": "Softmax",
   "pythonClassName": "nn.Softmax",
   "expr": "",
+  "view": {
+    "color": "#f4a460",
+    "width": 100,
+    "height": 50
+  },
   "params": {
     "dim": {
       "type": "int",

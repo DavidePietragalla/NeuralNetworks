@@ -2,6 +2,11 @@
   "category": "Embedding",
   "pythonClassName": "nn.Embedding",
   "expr": "",
+  "view": {
+    "color": "#4169e1",
+    "width": 160,
+    "height": 60
+  },
   "params": {
     "num_embeddings": {
       "type": "int",
