@@ -11,9 +11,15 @@
   import SLayer from "../lib/components/SLayer.svelte";
   import SConnection from "$lib/components/SConnection.svelte";
   import { Diagram } from "$lib/diagram.svelte";
-  import { ENode } from "$lib/model/node";
 
   import SIstantiator from "$lib/components/SIstantiator.svelte";
+
+  import {
+    convert,
+    exportToJson,
+    importFromJson,
+    loadFromFile,
+  } from "$lib/utils";
 
   let selectedId = $state<string | null>(null);
   let istantiate: boolean = $state(false);
@@ -47,39 +53,6 @@
 
   function handlePaneClick({ event }: any) {
     selectedId = null;
-  }
-
-  function exportToJson() {
-    console.log(ENode.allNodes);
-    const flowState = {
-      model: Object.fromEntries(ENode.allNodes),
-      view: { nodes: d.nodes, edges: d.edges },
-    };
-    const jsonString = JSON.stringify(flowState, null, 2);
-    console.log("JSON Esportato:", jsonString);
-    alert("JSON generato! Guarda la console.");
-    return jsonString;
-  }
-
-  function importFromJson(jsonString: string) {
-    try {
-      const parsedData = JSON.parse(jsonString);
-      d.nodes = parsedData.nodes || [];
-      d.edges = parsedData.edges || [];
-
-      if (d.nodes.length > 0) {
-        const ids = d.nodes.map((n) => parseInt(n.id.replace("Node_", "")));
-        ENode.counter = Math.max(...ids) + 1;
-      }
-    } catch (error) {
-      console.error("Errore durante il parsing del JSON:", error);
-      alert("Il JSON fornito non è valido.");
-    }
-  }
-
-  function testImport() {
-    const dummyJson = `{"nodes":[{"id":"layer_1","type":"default","position":{"x":100,"y":100},"data":{"label":"Input Layer"}}],"edges":[]}`;
-    importFromJson(dummyJson);
   }
 
   // 3. FUNZIONI PER GESTIRE L'APERTURA DELLA MODALE
@@ -122,8 +95,9 @@
     >
 
     <div class="divider"></div>
-    <button onclick={exportToJson}>💾 Esporta JSON</button>
-    <button onclick={testImport}>📂 Testa Import JSON</button>
+    <button onclick={() => exportToJson(d)}>💾 Esporta JSON</button>
+    <button onclick={() => loadFromFile(d)}>📂 Carica JSON</button>
+    <button onclick={() => convert(d)}>💾 Converti </button>
   </div>
 
   <div class="flow-wrapper">
