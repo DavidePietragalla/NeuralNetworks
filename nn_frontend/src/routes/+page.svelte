@@ -22,6 +22,8 @@
   } from "$lib/utils";
 
   let selectedId = $state<string | null>(null);
+  let selectedType = $state<'node' | 'edge' | null>(null);
+
   let istantiate: boolean = $state(false);
 
   // 1. NUOVO STATO: Ricorda quale nodo stiamo aprendo nella modale
@@ -29,11 +31,17 @@
 
   let d = new Diagram();
 
-  function deleteSelectedNode() {
-    if (selectedId) {
+  function deleteSelectedElement() {
+    if (!selectedId || !selectedType) return;
+
+    if (selectedType === 'node') {
       d.deleteNode(selectedId);
-      selectedId = null;
+    } else if (selectedType === 'edge') {
+      d.deleteEdge(selectedId); 
     }
+
+    selectedId = null;
+    selectedType = null;
   }
 
   function onconnect(connection: any) {
@@ -42,6 +50,12 @@
 
   function handleNodeClick({ event, node }: any) {
     selectedId = node.id;
+    selectedType = 'node';
+  }
+
+  function handleEdgeClick({ event, edge }: any) {
+    selectedId = edge.id;
+    selectedType = 'edge';
   }
 
   // 2. EXTRA UX: Aprire la modifica con un doppio click sul nodo!
@@ -53,6 +67,7 @@
 
   function handlePaneClick({ event }: any) {
     selectedId = null;
+    selectedType = null;
   }
 
   // 3. FUNZIONI PER GESTIRE L'APERTURA DELLA MODALE
@@ -63,7 +78,7 @@
   }
 
   function openEditModal() {
-    if (selectedId) {
+    if (selectedId && selectedType === 'node') {
       editTargetId = selectedId; // Impostiamo l'ID da Modificare
       istantiate = true;
     }
@@ -83,13 +98,13 @@
     <button onclick={openCreateModal}>➕ Aggiungi Module</button>
 
     <button
-      onclick={openEditModal}
-      disabled={!selectedId}
-      class:active={selectedId !== null}>✏️ Modifica</button
+    onclick={openEditModal}
+    disabled={selectedType !== 'node'}
+    class:active={selectedType === 'node'}>✏️ Modifica</button
     >
 
     <button
-      onclick={deleteSelectedNode}
+      onclick={deleteSelectedElement}
       disabled={!selectedId}
       class:danger={selectedId !== null}>❌ Elimina</button
     >
@@ -108,6 +123,7 @@
       {edgeTypes}
       fitView
       onnodeclick={handleNodeClick}
+      onedgeclick={handleEdgeClick}
       onnodedoubleclick={handleNodeDoubleClick}
       onpaneclick={handlePaneClick}
       {onconnect}

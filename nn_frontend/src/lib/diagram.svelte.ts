@@ -83,6 +83,23 @@ export class Diagram {
     this.edges = this.edges.filter(edge => edge.source !== id && edge.target !== id);
   }
 
+  public deleteEdge(id: string) {
+    const edgeToDelete = this.edges.find(edge => edge.id === id);
+    
+    if (!edgeToDelete) return;
+
+    let source = ENode.fromId(edgeToDelete.source);
+    let target = ENode.fromId(edgeToDelete.target);
+
+    if (source !== undefined && target !== undefined) {
+      source.remove_next_node(target);
+    } else {
+      console.warn("Source or target not found for edge deletion.");
+    }
+    
+    this.edges = this.edges.filter(edge => edge.id !== id);
+  }
+
   public updateModule(
     id: string,
     stereotype: Stereotype,
