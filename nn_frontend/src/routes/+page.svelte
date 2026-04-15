@@ -9,6 +9,8 @@
   import "@xyflow/svelte/dist/style.css";
 
   import SLayer from "../lib/components/SLayer.svelte";
+  import SJoin  from "../lib/components/SJoin.svelte";
+  import SFork from "../lib/components/SFork.svelte";
   import SConnection from "$lib/components/SConnection.svelte";
   import { Diagram } from "$lib/diagram.svelte";
 
@@ -20,6 +22,8 @@
     importFromJson,
     loadFromFile,
   } from "$lib/utils";
+
+  import { ENode } from "$lib/model/node";
 
   let selectedId = $state<string | null>(null);
   let selectedType = $state<'node' | 'edge' | null>(null);
@@ -58,11 +62,16 @@
     selectedType = 'edge';
   }
 
-  // 2. EXTRA UX: Aprire la modifica con un doppio click sul nodo!
   function handleNodeDoubleClick({ event, node }: any) {
     selectedId = node.id;
-    editTargetId = node.id;
-    istantiate = true;
+    selectedType = 'node';
+
+    const nodeModel = ENode.fromId(node.id);
+    
+    if (nodeModel && nodeModel.getType() === "Module") {
+      editTargetId = node.id;
+      istantiate = true;
+    }
   }
 
   function handlePaneClick({ event }: any) {
@@ -78,18 +87,30 @@
   }
 
   function openEditModal() {
-    if (selectedId && selectedType === 'node') {
-      editTargetId = selectedId; // Impostiamo l'ID da Modificare
+  if (selectedId && selectedType === 'node') {
+    const nodeModel = ENode.fromId(selectedId);
+    if (nodeModel && nodeModel.getType() === "Module") {
+      editTargetId = selectedId; 
       istantiate = true;
     }
   }
+}
 
   function closeModal() {
     istantiate = false;
     editTargetId = null; // Pulizia quando si chiude
   }
 
-  const nodeTypes = { Module: SLayer };
+  function newJoin() {
+    d.addJoin();
+  }
+
+  // TODO: Gli edge non distinguono i vari punti del fork e quindi va gestito.
+  function newFork() {
+    d.addFork();
+  }
+
+  const nodeTypes = { Module: SLayer, Join: SJoin, Fork: SFork };
   const edgeTypes = { connection: SConnection };
 </script>
 
@@ -102,6 +123,10 @@
     disabled={selectedType !== 'node'}
     class:active={selectedType === 'node'}>✏️ Modifica</button
     >
+
+    <button onclick={newJoin}>🔗 Inserisci Join</button> 
+
+    <button onclick={newFork}>🔱 Inserisci Fork</button> 
 
     <button
       onclick={deleteSelectedElement}
