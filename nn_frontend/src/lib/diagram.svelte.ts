@@ -92,7 +92,7 @@ export class Diagram {
 
   public deleteEdge(id: string) {
     const edgeToDelete = this.edges.find(edge => edge.id === id);
-    
+
     if (!edgeToDelete) return;
 
     let source = ENode.fromId(edgeToDelete.source);
@@ -103,7 +103,7 @@ export class Diagram {
     } else {
       console.warn("Source or target not found for edge deletion.");
     }
-    
+
     this.edges = this.edges.filter(edge => edge.id !== id);
   }
 
@@ -163,6 +163,7 @@ export class Diagram {
     let loss: Object | null = null;
     // Navighiamo il grafo sequenzialmente
     while (currentNode) {
+      console.log(currentNode);
       if (currentNode.getType() === "Module") {
         const mod = currentNode as Module;
 
@@ -209,7 +210,7 @@ export class Diagram {
       }
 
       // 3. Passiamo al nodo successivo (assumendo che ce ne sia solo uno)
-      currentNode = currentNode.next_nodes.length > 0 ? currentNode.next_nodes[0] : undefined;
+      currentNode = currentNode.next_nodes.length > 0 ? ENode.fromId(currentNode.next_nodes[0]) : undefined;
     }
 
     return JSON.stringify({ network: sequence, loss: loss }, null, 2);

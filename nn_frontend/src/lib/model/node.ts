@@ -8,7 +8,7 @@ export abstract class ENode {
   public id: string;
   public hyperparameters: Array<Hyperparameter>;
 
-  public next_nodes: Array<ENode>;
+  public next_nodes: Array<string>;
 
   constructor() {
     this.id = "ENode_" + ENode.counter++;
@@ -19,11 +19,11 @@ export abstract class ENode {
   }
 
   public add_next_node(l: ENode) {
-    this.next_nodes.push(l);
+    this.next_nodes.push(l.id);
   }
 
   public remove_next_node(l: ENode) {
-    const index = this.next_nodes.indexOf(l, 0);
+    const index = this.next_nodes.indexOf(l.id, 0);
     if (index > -1) {
       this.next_nodes.splice(index, 1);
     }

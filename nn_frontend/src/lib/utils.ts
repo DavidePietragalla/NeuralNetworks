@@ -1,3 +1,4 @@
+import { Module } from "./model/module";
 import type { Diagram } from "./diagram.svelte";
 import { ENode } from "./model/node";
 
@@ -133,10 +134,14 @@ export function importFromJson(d: Diagram, jsonString: string) {
     // 2. Ripristina il dizionario (Map) in backend (ENode.allNodes)
     ENode.allNodes.clear();
     for (const [key, value] of Object.entries(parsedData.model)) {
-      // Ripristiniamo l'oggetto nella mappa static
       // Nota: Questo inserisce i dati raw. Se i tuoi ENode/Module usano metodi di classe
       // (es. add_next_node), i dati andrebbero re-istanziati tramite "new Module(...)".
-      ENode.allNodes.set(key, value as any);
+      const rawNode = value as any;
+      // TODO: distiguere tra Module e join
+      if (rawNode.stereotype) {
+        Object.setPrototypeOf(rawNode, Module.prototype);
+      }
+      ENode.allNodes.set(key, rawNode);
     }
 
     // 3. Aggiorna il contatore interno per evitare conflitti con i nuovi ID

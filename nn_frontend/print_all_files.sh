@@ -10,12 +10,16 @@ find "$TARGET_DIR" -type f \
   -not -path "*/.svelte-kit/*" \
   -not -name "favicon.svg" \
   -not -name "*.ico" \
+  -not -name "*.css" \
+  -not -name "fork.ts" \
+  -not -name "join.ts" \
+  -not -name "hyperparameter.ts" \
   -not -name "*.png" | sort | while read -r file; do
 
   # Controlla se il file si trova dentro la cartella Modules
   if [[ "$file" == *"/Modules/"* ]]; then
     # Se abbiamo già visto 2 moduli, salta questo file
-    if [ "$MODULES_SEEN" -ge 2 ]; then
+    if [ "$MODULES_SEEN" -ge 0 ]; then
       continue
     fi
     # Altrimenti incrementa il contatore
