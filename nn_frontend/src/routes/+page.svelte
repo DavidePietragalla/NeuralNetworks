@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     SvelteFlow,
+    useSvelteFlow,
     Controls,
     Background,
     BackgroundVariant,
@@ -10,7 +11,6 @@
 
   import SLayer from "../lib/components/SLayer.svelte";
   import SJoin  from "../lib/components/SJoin.svelte";
-  import SFork from "../lib/components/SFork.svelte";
   import SConnection from "$lib/components/SConnection.svelte";
   import { Diagram } from "$lib/diagram.svelte";
 
@@ -34,6 +34,24 @@
   let editTargetId = $state<string | null>(null);
 
   let d = new Diagram();
+
+  const { screenToFlowPosition, getViewport } = useSvelteFlow();
+  
+  function getCenterCoordinates() {
+    const wrapper = document.querySelector('.flow-wrapper');
+    if (!wrapper) return { x: 100, y: 100 };
+
+    const rect = wrapper.getBoundingClientRect();
+    
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const rawPos = screenToFlowPosition({ x: centerX, y: centerY });
+    return {
+      x: rawPos.x - 50,
+      y: rawPos.y - 30
+    };
+  }
 
   function deleteSelectedElement() {
     if (!selectedId || !selectedType) return;
@@ -79,7 +97,7 @@
     selectedType = null;
   }
 
-  // 3. FUNZIONI PER GESTIRE L'APERTURA DELLA MODALE
+  // FUNZIONI PER GESTIRE L'APERTURA DELLA MODALE
   function openCreateModal(e: Event) {
     e.stopPropagation();
     editTargetId = null; // Ci assicuriamo che sia null per la Creazione
@@ -87,30 +105,58 @@
   }
 
   function openEditModal() {
-  if (selectedId && selectedType === 'node') {
-    const nodeModel = ENode.fromId(selectedId);
-    if (nodeModel && nodeModel.getType() === "Module") {
-      editTargetId = selectedId; 
-      istantiate = true;
+    if (selectedId && selectedType === 'node') {
+      const nodeModel = ENode.fromId(selectedId);
+      if (nodeModel && nodeModel.getType() === "Module") {
+        editTargetId = selectedId; 
+        istantiate = true;
+      }
     }
   }
-}
 
   function closeModal() {
     istantiate = false;
     editTargetId = null; // Pulizia quando si chiude
   }
 
+  // LOGICA DI SALVATAGGIO DISACCOPPIATA
+  function handleSaveNode(data: any) {
+    if (editTargetId) {
+      // Aggiornamento
+      d.updateModule(
+        editTargetId,
+        data.stereotype,
+        data.name,
+        data.values,
+        data.color,
+        data.width,
+        data.height
+      );
+    } else {
+      // Creazione: Calcoliamo il centro della view
+      const coords = getCenterCoordinates();
+      d.addModule(
+        data.stereotype,
+        data.name,
+        data.values,
+        data.color,
+        data.width,
+        data.height,
+        coords.x,
+        coords.y
+      );
+    }
+    closeModal();
+  }
+
+  // Creazione di un Join al centro dello schermo
   function newJoin() {
-    d.addJoin();
+    const coords = getCenterCoordinates();
+    // Usa il nuovo addJoin che accetta x e y come definito in precedenza
+    d.addJoin(coords.x, coords.y); 
   }
 
-  // TODO: Gli edge non distinguono i vari punti del fork e quindi va gestito.
-  function newFork() {
-    d.addFork();
-  }
-
-  const nodeTypes = { Module: SLayer, Join: SJoin, Fork: SFork };
+  const nodeTypes = { Module: SLayer, Join: SJoin};
   const edgeTypes = { connection: SConnection };
 </script>
 
@@ -119,14 +165,12 @@
     <button onclick={openCreateModal}>➕ Aggiungi Module</button>
 
     <button
-    onclick={openEditModal}
-    disabled={selectedType !== 'node'}
-    class:active={selectedType === 'node'}>✏️ Modifica</button
+      onclick={openEditModal}
+      disabled={selectedType !== 'node'}
+      class:active={selectedType === 'node'}>✏️ Modifica</button
     >
 
     <button onclick={newJoin}>🔗 Inserisci Join</button> 
-
-    <button onclick={newFork}>🔱 Inserisci Fork</button> 
 
     <button
       onclick={deleteSelectedElement}
@@ -166,7 +210,8 @@
         <SIstantiator
           diagram={d}
           editNodeId={editTargetId}
-          onSuccess={closeModal}
+          onSave={handleSaveNode}
+          onCancel={closeModal}
         />
       </div>
 

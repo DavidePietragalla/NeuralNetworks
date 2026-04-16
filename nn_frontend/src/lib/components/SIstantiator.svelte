@@ -5,13 +5,22 @@
   import { ENode } from "$lib/model/node";
   import type { Module } from "$lib/model/module";
 
+  // 1. Interfaccia pulita: solo quello che serve al form
   interface Props {
     diagram: Diagram;
-    editNodeId?: string | null; // NUOVA PROP
-    onSuccess?: () => void;
+    editNodeId?: string | null;
+    onSave: (data: {
+      stereotype: Stereotype;
+      name: string | null;
+      values: Record<string, string>;
+      color: string;
+      width: string;
+      height: string;
+    }) => void;
+    onCancel: () => void;
   }
 
-  let { diagram, editNodeId = null, onSuccess }: Props = $props();
+  let { diagram, editNodeId = null, onSave, onCancel }: Props = $props();
 
   let name: string = $state("");
   let selection: Stereotype | null = $state(null);
@@ -22,7 +31,6 @@
 
   let parameterValues: Record<string, string> = $state({});
 
-  // Variabili per tracciare i cambiamenti senza finire in loop infiniti
   let isEditing = $derived(editNodeId !== null);
   let oldEditId: string | null = $state(null);
   let oldSelection: Stereotype | null = $state(null);
@@ -57,14 +65,12 @@
     }
   });
 
-  // EFFETTO 2: Gestisce i default se l'utente cambia manualmente lo stereotipo dal Dropdown
+  // EFFETTO 2: Gestisce i default se l'utente cambia lo stereotipo dal Dropdown
   $effect(() => {
     if (selection !== oldSelection) {
       oldSelection = selection;
 
       if (selection) {
-        // Applichiamo i default SOLO se stiamo creando, oppure se stiamo modificando
-        // ma l'utente ha deciso di cambiare lo stereotipo in corso d'opera.
         const isSameAsEdited =
           isEditing &&
           editNodeId &&
@@ -109,33 +115,17 @@
     const valuesToSave = $state.snapshot(parameterValues);
     const finalName = name.trim() === "" ? null : name;
 
-    // BIVIO: Creazione vs Modifica
-    if (isEditing && editNodeId) {
-      diagram.updateModule(
-        editNodeId,
-        selection,
-        finalName,
-        valuesToSave,
-        nodeColor,
-        `${nodeWidth}px`,
-        `${nodeHeight}px`,
-      );
-    } else {
-      diagram.addModule(
-        selection,
-        finalName,
-        valuesToSave,
-        nodeColor,
-        `${nodeWidth}px`,
-        `${nodeHeight}px`,
-      );
-    }
+    // 2. Invece di usare il diagramma qui, passiamo i dati al padre!
+    onSave({
+      stereotype: selection,
+      name: finalName,
+      values: valuesToSave,
+      color: nodeColor,
+      width: `${nodeWidth}px`,
+      height: `${nodeHeight}px`,
+    });
 
     resetForm();
-
-    if (onSuccess) {
-      onSuccess();
-    }
   }
 </script>
 
@@ -197,7 +187,11 @@
           bind:value={parameterValues[key]}
         /><br /><br />
       {/each}
-      <input type="submit" value={isEditing ? "Update Node" : "Create Node"} />
+      
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button type="button" onclick={onCancel}>Cancel</button>
+        <input type="submit" value={isEditing ? "Update Node" : "Create Node"} />
+      </div>
     </form>
   {/if}
 </div>

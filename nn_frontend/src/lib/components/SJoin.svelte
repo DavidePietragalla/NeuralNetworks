@@ -1,12 +1,35 @@
 <script lang="ts">
-  import type { Join } from "$lib/model/join"; 
-  import { ENode } from "$lib/model/node";
   import { Handle, Position, type NodeProps } from "@xyflow/svelte";
+  import { ENode } from "$lib/model/node";
+  import type { Join } from "$lib/model/join"; // Assuming a Join model exists
 
   let { id, data, selected }: NodeProps = $props();
+  // Casting to Join model
+  let j: Join = $derived(ENode.fromId(data.enode as string) as Join);
 
-  // Recuperiamo l'istanza dal modello
-  let j: Join = $derived(ENode.fromId(data.enode as string)) as Join;
+  let inputsCount = $state(2);
+  
+  $effect(() => {
+    if (j) {
+      inputsCount = j.numberOfInputs;
+    }
+  });
+
+  function increase(e: Event) {
+    e.stopPropagation();
+    if (j) {
+      j.numberOfInputs++;
+      inputsCount = j.numberOfInputs;
+    }
+  }
+
+  function decrease(e: Event) {
+    e.stopPropagation();
+    if (j && j.numberOfInputs > 2) {
+      j.numberOfInputs--;
+      inputsCount = j.numberOfInputs;
+    }
+  }
 
   function handleInternalClick() {
     console.log(`Join ${id} was clicked!`);
@@ -28,13 +51,31 @@
   role="button"
   tabindex="0"
 >
-  <div class="join-container">
-    <Handle type="target" position={Position.Top} />
+  <button class="btn-branch" onclick={decrease} disabled={inputsCount <= 2}>
+    -
+  </button>
 
-    <div class="rhombus"></div>
+  <div class="join-center">
+    {#each Array(inputsCount) as _, i}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id={`in-${i}`}
+        style={`left: ${((i + 1) * 100) / (inputsCount + 1)}%;`}
+      />
+    {/each}
 
-    <Handle type="source" position={Position.Bottom} />
+    <div 
+      class="join-line" 
+      style={`width: ${Math.max(120, inputsCount * 30)}px;`}
+    ></div>
+
+    <Handle type="source" position={Position.Bottom} id="out" />
   </div>
+
+  <button class="btn-branch" onclick={increase}>
+    +
+  </button>
 </div>
 
 <style>
@@ -43,22 +84,44 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 4px; 
-    border-radius: 8px;
+    gap: 8px;
+    padding: 10px;
     cursor: pointer;
-    transition: filter 0.2s ease;
   }
 
-  .join-container {
+  .join-center {
     position: relative;
-    width: 40px;
-    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0; 
   }
 
-  .rhombus {
-    width: 100%;
-    height: 100%;
-    background-color: #000000;
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  }  
+  .join-line {
+    height: 6px;
+    background-color: #333;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .btn-branch {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .btn-branch:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
 </style>

@@ -4,7 +4,6 @@ import { VConnection } from "./view/connection";
 import { VNode } from "./view/node";
 import { Stereotype } from "./model/stereotype";
 import { Join } from "./model/join";
-import { Fork } from "./model/fork";
 
 export class Diagram {
   public stereotypes: Array<Stereotype> = [];
@@ -66,16 +65,9 @@ export class Diagram {
     this.edges = [...this.edges, newVConn];
   }
 
-  public addJoin() {
+  public addJoin( x: number | null = null, y: number | null = null) {
     const j = new Join();
-    const n = new VNode(j, null, null, "#000000", "80px", "80px");
-    this.nodes = [...this.nodes, n];
-  }
-
-  public addFork() {
-    const f = new Fork();
-    const n = new VNode(f, null, null, "#000000", "120px", "20px");
-
+    const n = new VNode(j, x, y, "#000000", "80px", "80px");
     this.nodes = [...this.nodes, n];
   }
 
