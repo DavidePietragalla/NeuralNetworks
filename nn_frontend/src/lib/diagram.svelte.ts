@@ -45,11 +45,8 @@ export class Diagram {
   }
 
   public addConnection(connection: any) {
-    const newVConn = new VConnection(
-      `e-${connection.source}-${connection.target}`,
-      connection.source, // Qui passiamo gli ID (string)
-      connection.target
-    );
+
+    console.log(connection);
 
     // UPDATE MODEL
     let source = ENode.fromId(connection.source);
@@ -59,13 +56,28 @@ export class Diagram {
     if (source === undefined || target === undefined)
       throw Error("the source or target are undefined");
 
+
+
+    // let targetHandle = null;
+    // if (target.getType() === "Join") {
+    //   targetHandle = target.getNumberOfInputs();
+    //   target.takenInput++;
+    // }
+
+
+    const newVConn = new VConnection(
+      `e-${connection.source}-${connection.target}`,
+      connection.source, // Qui passiamo gli ID (strin)
+      connection.target,
+      connection.targetHandle,
+    );
     source.add_next_node(target);
 
     // ADD TO VIEW
     this.edges = [...this.edges, newVConn];
   }
 
-  public addJoin( x: number | null = null, y: number | null = null) {
+  public addJoin(x: number | null = null, y: number | null = null) {
     const j = new Join();
     const n = new VNode(j, x, y, "#000000", "80px", "80px");
     this.nodes = [...this.nodes, n];
@@ -182,7 +194,7 @@ export class Diagram {
             };
           });
           loss = {
-            id: `layer_${step}`,
+            id: `loss_${step}`,
             name: mod.name,
             target: mod.stereotype.pythonClassName, // es: "nn.Conv2d"
             params: paramsObj

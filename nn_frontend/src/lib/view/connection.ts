@@ -7,13 +7,14 @@ export class VConnection {
   public type: string;
   public markerEnd: any;
   public style: string;
+  public targetHandle: string | null;
 
-  constructor(id: string, source: string, target: string) {
+  constructor(id: string, source: string, target: string, targetHandle: string | null = null) {
     this.id = id;
     this.source = source;
     this.target = target;
     this.type = 'connection'; // Deve corrispondere alla chiave in edgeTypes
-
+    this.targetHandle = targetHandle;
     this.markerEnd = {
       type: MarkerType.ArrowClosed,
       width: 10,

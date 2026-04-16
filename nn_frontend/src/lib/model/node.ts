@@ -38,5 +38,4 @@ export abstract class ENode {
   }
 
   abstract getType(): string;
-
 }

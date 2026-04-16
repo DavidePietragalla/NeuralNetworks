@@ -14,5 +14,6 @@ export class Join extends ENode {
 
   getType(): string {
     return "Join";
- }
+  }
+
 }

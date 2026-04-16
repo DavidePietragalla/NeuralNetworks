@@ -8,7 +8,7 @@
   let j: Join = $derived(ENode.fromId(data.enode as string) as Join);
 
   let inputsCount = $state(2);
-  
+
   $effect(() => {
     if (j) {
       inputsCount = j.numberOfInputs;
@@ -65,17 +65,12 @@
       />
     {/each}
 
-    <div 
-      class="join-line" 
-      style={`width: ${Math.max(120, inputsCount * 30)}px;`}
-    ></div>
+    <div class="join-line" style={`width: ${inputsCount * 30}px;`}></div>
 
     <Handle type="source" position={Position.Bottom} id="out" />
   </div>
 
-  <button class="btn-branch" onclick={increase}>
-    +
-  </button>
+  <button class="btn-branch" onclick={increase}> + </button>
 </div>
 
 <style>
@@ -94,7 +89,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px 0; 
+    padding: 10px 0;
   }
 
   .join-line {
@@ -117,7 +112,9 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    transition: background 0.2s, color 0.2s;
+    transition:
+      background 0.2s,
+      color 0.2s;
   }
 
   .btn-branch:disabled {
@@ -125,3 +122,4 @@
     cursor: not-allowed;
   }
 </style>
+

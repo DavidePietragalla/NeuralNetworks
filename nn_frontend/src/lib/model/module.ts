@@ -7,7 +7,7 @@ export interface InstanceParameter {
   type: string; // python type
   value: string;
 }
-
+// TODO: Module have takenInput at most 1
 export class Module extends ENode {
 
   public static counter: number = 0;
