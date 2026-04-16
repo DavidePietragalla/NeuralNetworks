@@ -1,6 +1,7 @@
 import { Module } from "./model/module";
 import type { Diagram } from "./diagram.svelte";
 import { ENode } from "./model/node";
+import { Join } from "./model/join";
 
 export async function loadFromFile(d: Diagram) {
   try {
@@ -137,10 +138,15 @@ export function importFromJson(d: Diagram, jsonString: string) {
       // Nota: Questo inserisce i dati raw. Se i tuoi ENode/Module usano metodi di classe
       // (es. add_next_node), i dati andrebbero re-istanziati tramite "new Module(...)".
       const rawNode = value as any;
-      // TODO: distiguere tra Module e join
-      if (rawNode.stereotype) {
+      // TODO: distiguere tra le varie sottoclassi di ENode
+      Object.setPrototypeOf(rawNode, ENode.prototype);
+
+      if (rawNode.numberOfInputs) {
+        Object.setPrototypeOf(rawNode, Join.prototype);
+      } else {
         Object.setPrototypeOf(rawNode, Module.prototype);
       }
+
       ENode.allNodes.set(key, rawNode);
     }
 
