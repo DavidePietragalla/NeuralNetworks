@@ -1,0 +1,8 @@
+defaults:
+- net: custom_sequence
+- optimizer: adam
+- trainer: default
+- wandb: wandb
+- dataset: dataset
+- _self_
+seed: 42

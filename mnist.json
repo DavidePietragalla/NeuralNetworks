@@ -1,0 +1,769 @@
+{
+  "model": {
+    "ENode_0": {
+      "id": "ENode_0",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_1"
+      ],
+      "name": "Input_0",
+      "expr": "",
+      "params": [
+        {
+          "name": "out_features",
+          "type": "int",
+          "value": "784"
+        }
+      ],
+      "stereotypeName": "Input",
+      "stereotype": {
+        "file_path": "./Modules/Input.json",
+        "category": "Input",
+        "pythonClassName": "None",
+        "expr": "",
+        "parameters": {
+          "out_features": {
+            "type": "int",
+            "default": "784"
+          }
+        },
+        "view": {
+          "color": "#27b376",
+          "width": 25,
+          "height": 15
+        }
+      }
+    },
+    "ENode_1": {
+      "id": "ENode_1",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_2"
+      ],
+      "name": "Features",
+      "expr": "",
+      "params": [
+        {
+          "name": "in_features",
+          "type": "int",
+          "value": "784"
+        },
+        {
+          "name": "out_features",
+          "type": "int",
+          "value": "350"
+        },
+        {
+          "name": "bias",
+          "type": "bool",
+          "value": "True"
+        },
+        {
+          "name": "device",
+          "type": "str",
+          "value": "None"
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "value": "None"
+        }
+      ],
+      "stereotypeName": "Linear",
+      "stereotype": {
+        "file_path": "./Modules/Linear.json",
+        "category": "Linear",
+        "pythonClassName": "nn.Linear",
+        "expr": "",
+        "parameters": {
+          "in_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "out_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "bias": {
+            "type": "bool",
+            "default": "True"
+          },
+          "device": {
+            "type": "str",
+            "default": "None"
+          },
+          "dtype": {
+            "type": "str",
+            "default": "None"
+          }
+        },
+        "view": {
+          "color": "#4779c4",
+          "width": 140,
+          "height": 60
+        }
+      }
+    },
+    "ENode_2": {
+      "id": "ENode_2",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_3"
+      ],
+      "name": "tanh",
+      "expr": "",
+      "params": [],
+      "stereotypeName": "Tanh",
+      "stereotype": {
+        "file_path": "./Modules/Tanh.json",
+        "category": "Tanh",
+        "pythonClassName": "nn.Tanh",
+        "expr": "",
+        "parameters": {},
+        "view": {
+          "color": "#f4a460",
+          "width": 100,
+          "height": 50
+        }
+      }
+    },
+    "ENode_3": {
+      "id": "ENode_3",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_4"
+      ],
+      "name": "features2",
+      "expr": "",
+      "params": [
+        {
+          "name": "in_features",
+          "type": "int",
+          "value": "350"
+        },
+        {
+          "name": "out_features",
+          "type": "int",
+          "value": "175"
+        },
+        {
+          "name": "bias",
+          "type": "bool",
+          "value": "True"
+        },
+        {
+          "name": "device",
+          "type": "str",
+          "value": "None"
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "value": "None"
+        }
+      ],
+      "stereotypeName": "Linear",
+      "stereotype": {
+        "file_path": "./Modules/Linear.json",
+        "category": "Linear",
+        "pythonClassName": "nn.Linear",
+        "expr": "",
+        "parameters": {
+          "in_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "out_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "bias": {
+            "type": "bool",
+            "default": "True"
+          },
+          "device": {
+            "type": "str",
+            "default": "None"
+          },
+          "dtype": {
+            "type": "str",
+            "default": "None"
+          }
+        },
+        "view": {
+          "color": "#4779c4",
+          "width": 140,
+          "height": 60
+        }
+      }
+    },
+    "ENode_4": {
+      "id": "ENode_4",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_5"
+      ],
+      "name": "tanh",
+      "expr": "",
+      "params": [],
+      "stereotypeName": "Tanh",
+      "stereotype": {
+        "file_path": "./Modules/Tanh.json",
+        "category": "Tanh",
+        "pythonClassName": "nn.Tanh",
+        "expr": "",
+        "parameters": {},
+        "view": {
+          "color": "#f4a460",
+          "width": 100,
+          "height": 50
+        }
+      }
+    },
+    "ENode_5": {
+      "id": "ENode_5",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_7"
+      ],
+      "name": "features3",
+      "expr": "",
+      "params": [
+        {
+          "name": "in_features",
+          "type": "int",
+          "value": "175"
+        },
+        {
+          "name": "out_features",
+          "type": "int",
+          "value": "75"
+        },
+        {
+          "name": "bias",
+          "type": "bool",
+          "value": "True"
+        },
+        {
+          "name": "device",
+          "type": "str",
+          "value": "None"
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "value": "None"
+        }
+      ],
+      "stereotypeName": "Linear",
+      "stereotype": {
+        "file_path": "./Modules/Linear.json",
+        "category": "Linear",
+        "pythonClassName": "nn.Linear",
+        "expr": "",
+        "parameters": {
+          "in_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "out_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "bias": {
+            "type": "bool",
+            "default": "True"
+          },
+          "device": {
+            "type": "str",
+            "default": "None"
+          },
+          "dtype": {
+            "type": "str",
+            "default": "None"
+          }
+        },
+        "view": {
+          "color": "#4779c4",
+          "width": 140,
+          "height": 60
+        }
+      }
+    },
+    "ENode_6": {
+      "id": "ENode_6",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_8"
+      ],
+      "name": "output",
+      "expr": "",
+      "params": [
+        {
+          "name": "in_features",
+          "type": "int",
+          "value": "75"
+        },
+        {
+          "name": "out_features",
+          "type": "int",
+          "value": "10"
+        },
+        {
+          "name": "bias",
+          "type": "bool",
+          "value": "True"
+        },
+        {
+          "name": "device",
+          "type": "str",
+          "value": "None"
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "value": "None"
+        }
+      ],
+      "stereotypeName": "Linear",
+      "stereotype": {
+        "file_path": "./Modules/Linear.json",
+        "category": "Linear",
+        "pythonClassName": "nn.Linear",
+        "expr": "",
+        "parameters": {
+          "in_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "out_features": {
+            "type": "int",
+            "default": "Undefined"
+          },
+          "bias": {
+            "type": "bool",
+            "default": "True"
+          },
+          "device": {
+            "type": "str",
+            "default": "None"
+          },
+          "dtype": {
+            "type": "str",
+            "default": "None"
+          }
+        },
+        "view": {
+          "color": "#4779c4",
+          "width": 140,
+          "height": 60
+        }
+      }
+    },
+    "ENode_7": {
+      "id": "ENode_7",
+      "hyperparameters": [],
+      "next_nodes": [
+        "ENode_6"
+      ],
+      "name": "tanh",
+      "expr": "",
+      "params": [],
+      "stereotypeName": "Tanh",
+      "stereotype": {
+        "file_path": "./Modules/Tanh.json",
+        "category": "Tanh",
+        "pythonClassName": "nn.Tanh",
+        "expr": "",
+        "parameters": {},
+        "view": {
+          "color": "#f4a460",
+          "width": 100,
+          "height": 50
+        }
+      }
+    },
+    "ENode_8": {
+      "id": "ENode_8",
+      "hyperparameters": [],
+      "next_nodes": [],
+      "name": "CrossEntropy",
+      "expr": "",
+      "params": [
+        {
+          "name": "weight",
+          "type": "Tensor",
+          "value": "None"
+        },
+        {
+          "name": "size_average",
+          "type": "bool",
+          "value": "None"
+        },
+        {
+          "name": "ignore_index",
+          "type": "int",
+          "value": "-100"
+        },
+        {
+          "name": "reduce",
+          "type": "bool",
+          "value": "None"
+        },
+        {
+          "name": "reduction",
+          "type": "str",
+          "value": "mean"
+        },
+        {
+          "name": "label_smoothing",
+          "type": "float",
+          "value": "0.0"
+        }
+      ],
+      "stereotypeName": "CrossEntropyLoss",
+      "stereotype": {
+        "file_path": "./Modules/CrossEntropyLoss.json",
+        "category": "CrossEntropyLoss",
+        "pythonClassName": "nn.CrossEntropyLoss",
+        "expr": "",
+        "parameters": {
+          "weight": {
+            "type": "Tensor",
+            "default": "None"
+          },
+          "size_average": {
+            "type": "bool",
+            "default": "None"
+          },
+          "ignore_index": {
+            "type": "int",
+            "default": "-100"
+          },
+          "reduce": {
+            "type": "bool",
+            "default": "None"
+          },
+          "reduction": {
+            "type": "str",
+            "default": "mean"
+          },
+          "label_smoothing": {
+            "type": "float",
+            "default": "0.0"
+          }
+        },
+        "view": {
+          "color": "#cd5c5c",
+          "width": 160,
+          "height": 60
+        }
+      }
+    }
+  },
+  "view": {
+    "nodes": [
+      {
+        "id": "ENode_0",
+        "position": {
+          "x": 250,
+          "y": 50
+        },
+        "data": {
+          "enode": "ENode_0",
+          "color": "#4779c4",
+          "width": "100px",
+          "height": "60px",
+          "_tick": 1776605908631
+        },
+        "type": "Module",
+        "measured": {
+          "width": 54,
+          "height": 79
+        }
+      },
+      {
+        "id": "ENode_1",
+        "position": {
+          "x": 184.5,
+          "y": 190.4166717529297
+        },
+        "data": {
+          "enode": "ENode_1",
+          "color": "#4779c4",
+          "width": "140px",
+          "height": "60px",
+          "_tick": 1776605927014
+        },
+        "type": "Module",
+        "measured": {
+          "width": 184,
+          "height": 94
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_2",
+        "position": {
+          "x": 203.07999999999993,
+          "y": 338.4464105468751
+        },
+        "data": {
+          "enode": "ENode_2",
+          "color": "#f4a460",
+          "width": "100px",
+          "height": "50px",
+          "_tick": 1776605942643
+        },
+        "type": "Module",
+        "measured": {
+          "width": 144,
+          "height": 84
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_3",
+        "position": {
+          "x": 186.4912,
+          "y": 476.34081054687493
+        },
+        "data": {
+          "enode": "ENode_3",
+          "color": "#4779c4",
+          "width": "140px",
+          "height": "60px",
+          "_tick": 1776605959289
+        },
+        "type": "Module",
+        "measured": {
+          "width": 184,
+          "height": 94
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_4",
+        "position": {
+          "x": 207.22720000000004,
+          "y": 641.1920105468748
+        },
+        "data": {
+          "enode": "ENode_4",
+          "color": "#f4a460",
+          "width": "100px",
+          "height": "50px",
+          "_tick": 1776605973014
+        },
+        "type": "Module",
+        "measured": {
+          "width": 144,
+          "height": 84
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_5",
+        "position": {
+          "x": 185.45439999999996,
+          "y": 779.0864105468748
+        },
+        "data": {
+          "enode": "ENode_5",
+          "color": "#4779c4",
+          "width": "140px",
+          "height": "60px",
+          "_tick": 1776605997053
+        },
+        "type": "Module",
+        "measured": {
+          "width": 184,
+          "height": 94
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_6",
+        "position": {
+          "x": 187.52799999999996,
+          "y": 1051.7648105468745
+        },
+        "data": {
+          "enode": "ENode_6",
+          "color": "#4779c4",
+          "width": "140px",
+          "height": "60px",
+          "_tick": 1776606023906
+        },
+        "type": "Module",
+        "measured": {
+          "width": 184,
+          "height": 94
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_7",
+        "position": {
+          "x": 207.22720000000004,
+          "y": 921.1280105468746
+        },
+        "data": {
+          "enode": "ENode_7",
+          "color": "#f4a460",
+          "width": "100px",
+          "height": "50px",
+          "_tick": 1776606031071
+        },
+        "type": "Module",
+        "measured": {
+          "width": 144,
+          "height": 84
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "ENode_8",
+        "position": {
+          "x": 177.16000000000008,
+          "y": 1192.7696105468747
+        },
+        "data": {
+          "enode": "ENode_8",
+          "color": "#cd5c5c",
+          "width": "160px",
+          "height": "60px",
+          "_tick": 1776606056968
+        },
+        "type": "Module",
+        "measured": {
+          "width": 204,
+          "height": 94
+        },
+        "selected": true,
+        "dragging": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-ENode_0-ENode_1",
+        "source": "ENode_0",
+        "target": "ENode_1",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_1-ENode_2",
+        "source": "ENode_1",
+        "target": "ENode_2",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_2-ENode_3",
+        "source": "ENode_2",
+        "target": "ENode_3",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_3-ENode_4",
+        "source": "ENode_3",
+        "target": "ENode_4",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_4-ENode_5",
+        "source": "ENode_4",
+        "target": "ENode_5",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_5-ENode_7",
+        "source": "ENode_5",
+        "target": "ENode_7",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_7-ENode_6",
+        "source": "ENode_7",
+        "target": "ENode_6",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      },
+      {
+        "id": "e-ENode_6-ENode_8",
+        "source": "ENode_6",
+        "target": "ENode_8",
+        "type": "connection",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 10,
+          "height": 15,
+          "color": "#27b376"
+        },
+        "style": "stroke: #27b376; stroke-width: 2;",
+        "targetHandle": null
+      }
+    ]
+  }
+}

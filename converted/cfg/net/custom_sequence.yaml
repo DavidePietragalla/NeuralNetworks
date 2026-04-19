@@ -1,0 +1,45 @@
+sequence:
+- ENode_1
+- ENode_2
+- ENode_3
+- ENode_4
+- ENode_5
+- ENode_7
+- ENode_6
+name: SequentialModel_from_UI
+ENode_1:
+  _target_: torch.nn.Linear
+  in_features: 784
+  out_features: 350
+  bias: true
+ENode_2:
+  _target_: torch.nn.Tanh
+ENode_3:
+  _target_: torch.nn.Linear
+  in_features: 350
+  out_features: 175
+  bias: true
+ENode_4:
+  _target_: torch.nn.Tanh
+ENode_5:
+  _target_: torch.nn.Linear
+  in_features: 175
+  out_features: 75
+  bias: true
+ENode_7:
+  _target_: torch.nn.Tanh
+ENode_6:
+  _target_: torch.nn.Linear
+  in_features: 75
+  out_features: 10
+  bias: true
+loss_ENode_8:
+  _target_: torch.nn.CrossEntropyLoss
+  ignore_index: -100
+  reduction: mean
+  label_smoothing: 0.0
+loss:
+  _target_: torch.nn.CrossEntropyLoss
+  ignore_index: -100
+  reduction: mean
+  label_smoothing: 0.0

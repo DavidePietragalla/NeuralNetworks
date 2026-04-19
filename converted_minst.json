@@ -1,0 +1,172 @@
+{
+  "network": [
+    {
+      "id": "ENode_0",
+      "name": "Input_0",
+      "target": "None",
+      "params": {
+        "out_features": {
+          "value": "784",
+          "type": "int"
+        }
+      }
+    },
+    {
+      "id": "ENode_1",
+      "name": "Features",
+      "target": "nn.Linear",
+      "params": {
+        "in_features": {
+          "value": "784",
+          "type": "int"
+        },
+        "out_features": {
+          "value": "350",
+          "type": "int"
+        },
+        "bias": {
+          "value": "True",
+          "type": "bool"
+        },
+        "device": {
+          "value": "None",
+          "type": "str"
+        },
+        "dtype": {
+          "value": "None",
+          "type": "str"
+        }
+      }
+    },
+    {
+      "id": "ENode_2",
+      "name": "tanh",
+      "target": "nn.Tanh",
+      "params": {}
+    },
+    {
+      "id": "ENode_3",
+      "name": "features2",
+      "target": "nn.Linear",
+      "params": {
+        "in_features": {
+          "value": "350",
+          "type": "int"
+        },
+        "out_features": {
+          "value": "175",
+          "type": "int"
+        },
+        "bias": {
+          "value": "True",
+          "type": "bool"
+        },
+        "device": {
+          "value": "None",
+          "type": "str"
+        },
+        "dtype": {
+          "value": "None",
+          "type": "str"
+        }
+      }
+    },
+    {
+      "id": "ENode_4",
+      "name": "tanh",
+      "target": "nn.Tanh",
+      "params": {}
+    },
+    {
+      "id": "ENode_5",
+      "name": "features3",
+      "target": "nn.Linear",
+      "params": {
+        "in_features": {
+          "value": "175",
+          "type": "int"
+        },
+        "out_features": {
+          "value": "75",
+          "type": "int"
+        },
+        "bias": {
+          "value": "True",
+          "type": "bool"
+        },
+        "device": {
+          "value": "None",
+          "type": "str"
+        },
+        "dtype": {
+          "value": "None",
+          "type": "str"
+        }
+      }
+    },
+    {
+      "id": "ENode_7",
+      "name": "tanh",
+      "target": "nn.Tanh",
+      "params": {}
+    },
+    {
+      "id": "ENode_6",
+      "name": "output",
+      "target": "nn.Linear",
+      "params": {
+        "in_features": {
+          "value": "75",
+          "type": "int"
+        },
+        "out_features": {
+          "value": "10",
+          "type": "int"
+        },
+        "bias": {
+          "value": "True",
+          "type": "bool"
+        },
+        "device": {
+          "value": "None",
+          "type": "str"
+        },
+        "dtype": {
+          "value": "None",
+          "type": "str"
+        }
+      }
+    }
+  ],
+  "loss": {
+    "id": "loss_ENode_8",
+    "name": "CrossEntropy",
+    "target": "nn.CrossEntropyLoss",
+    "params": {
+      "weight": {
+        "value": "None",
+        "type": "Tensor"
+      },
+      "size_average": {
+        "value": "None",
+        "type": "bool"
+      },
+      "ignore_index": {
+        "value": "-100",
+        "type": "int"
+      },
+      "reduce": {
+        "value": "None",
+        "type": "bool"
+      },
+      "reduction": {
+        "value": "mean",
+        "type": "str"
+      },
+      "label_smoothing": {
+        "value": "0.0",
+        "type": "float"
+      }
+    }
+  }
+}

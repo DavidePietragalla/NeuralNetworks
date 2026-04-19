@@ -170,7 +170,7 @@ export class Diagram {
       throw new Error("Nodo di Input non trovato. Impossibile generare la sequenza.");
     }
 
-    const sequence: any[] = [];
+    const sequence: any[] = new Tree();
     let step = 0;
     let loss: Object | null = null;
     // Navighiamo il grafo sequenzialmente

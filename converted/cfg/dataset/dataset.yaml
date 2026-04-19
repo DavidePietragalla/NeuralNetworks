@@ -1,0 +1,5 @@
+import: dataset.mnist
+name: MNISTDataset
+params:
+  batch_size: 1024
+  train_size: 0.8

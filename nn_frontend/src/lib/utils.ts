@@ -1,7 +1,8 @@
-import { Module } from "./model/module";
 import type { Diagram } from "./diagram.svelte";
 import { ENode } from "./model/node";
+import { NNTree } from "./model/nntree";
 import { Join } from "./model/join";
+import { Module } from "./model/module";
 
 export async function loadFromFile(d: Diagram) {
   try {
@@ -104,8 +105,16 @@ async function saveToFile(jsonString: string) {
 }
 
 export async function convert(d: Diagram) {
-  const jsonString = d.exportSequentialGraph();
-  await saveToFile(jsonString);
+  try {
+    // Use the new NNTree-based conversion
+    const tree = new NNTree(d);
+    console.log(tree.printTree());
+    const jsonString = tree.toJSON();
+    await saveToFile(jsonString);
+  } catch (error: any) {
+    console.error("Conversion error:", error);
+    alert(error.message || "Errore durante la conversione del modello.");
+  }
 }
 
 export async function exportToJson(d: Diagram) {
@@ -138,7 +147,8 @@ export function importFromJson(d: Diagram, jsonString: string) {
       // Nota: Questo inserisce i dati raw. Se i tuoi ENode/Module usano metodi di classe
       // (es. add_next_node), i dati andrebbero re-istanziati tramite "new Module(...)".
       const rawNode = value as any;
-      // TODO: distiguere tra le varie sottoclassi di ENode
+      // TODO: distiguere tra le varie sottoclassi di Enode
+      console.log(`Loading node ${key}: next_nodes=${JSON.stringify(rawNode.next_nodes || [])}`);
       Object.setPrototypeOf(rawNode, ENode.prototype);
 
       if (rawNode.numberOfInputs) {
