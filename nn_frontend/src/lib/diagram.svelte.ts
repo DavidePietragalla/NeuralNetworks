@@ -3,10 +3,12 @@ import { ENode } from "./model/node";
 import { VConnection } from "./view/connection";
 import { VNode } from "./view/node";
 import { Stereotype } from "./model/stereotype";
+import { JoinStereotype } from "./model/joinStereotype";
 import { Join } from "./model/join";
 
 export class Diagram {
   public stereotypes: Array<Stereotype> = [];
+  public joins: Array<JoinStereotype> = [];
   public nodes: Array<VNode> = $state([]);
   public edges: Array<any> = $state([]);
 
@@ -23,6 +25,12 @@ export class Diagram {
       // Lo posizioniamo forzatamente in x: 250, y: 50
       this.addModule(inputStereotype, "Input_0", null, undefined, undefined, undefined, 250, 50);
     }
+
+    const joinFiles = import.meta.glob('./Joins/*.json', { eager: true });
+    this.joins = Object.entries(joinFiles).map(([path, data]) => {
+      const content = (data as any).default || data;
+      return new JoinStereotype(path, content);
+    });
   }
 
   // Aggiunti i parametri opzionali x e y
@@ -77,10 +85,31 @@ export class Diagram {
     this.edges = [...this.edges, newVConn];
   }
 
-  public addJoin(x: number | null = null, y: number | null = null) {
-    const j = new Join();
+  public addJoin(stereotype: JoinStereotype, x: number | null = null, y: number | null = null) {
+    const j = new Join(stereotype);
     const n = new VNode(j, x, y, "#000000", "80px", "80px");
     this.nodes = [...this.nodes, n];
+  }
+
+  public updateJoin(id: string, stereotype: JoinStereotype) {
+    const j = ENode.fromId(id) as Join;
+    if (!j) return;
+
+    (j as any).stereotype = stereotype;
+    (j as any).name = stereotype.name;
+
+    this.nodes = this.nodes.map(node => {
+      if (node.id === id) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            _tick: Date.now()
+          }
+        } as VNode;
+      }
+      return node;
+    });
   }
 
   public deleteNode(id: string) {

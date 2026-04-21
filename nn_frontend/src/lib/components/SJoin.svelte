@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Handle, Position, type NodeProps } from "@xyflow/svelte";
   import { ENode } from "$lib/model/node";
-  import type { Join } from "$lib/model/join"; // Assuming a Join model exists
+  import type { Join } from "$lib/model/join"; 
 
   let { id, data, selected }: NodeProps = $props();
-  // Casting to Join model
+  
   let j: Join = $derived(ENode.fromId(data.enode as string) as Join);
 
   let inputsCount = $state(2);
@@ -71,6 +71,10 @@
   </div>
 
   <button class="btn-branch" onclick={increase}> + </button>
+
+  <div class="join-label" title={j?.stereotype.name || ''}>
+    {j?.stereotype.name ? (j.stereotype.name.length > 8 ? j.stereotype.name.slice(0, 8) + '...' : j.stereotype.name) : ''}
+  </div>
 </div>
 
 <style>
@@ -121,5 +125,14 @@
     opacity: 0.2;
     cursor: not-allowed;
   }
-</style>
 
+  .join-label {
+    position: absolute;
+    bottom: 0px;
+    left: 20px;
+    font-size: 8px;
+    color: #888;
+    white-space: nowrap;
+    font-family: monospace;
+  }
+</style>

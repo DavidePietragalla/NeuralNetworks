@@ -29,8 +29,8 @@
   let selectedType = $state<'node' | 'edge' | null>(null);
 
   let istantiate: boolean = $state(false);
+  let istantiateJoin: boolean = $state(false);
 
-  // 1. NUOVO STATO: Ricorda quale nodo stiamo aprendo nella modale
   let editTargetId = $state<string | null>(null);
 
   let d = new Diagram();
@@ -97,32 +97,33 @@
     selectedType = null;
   }
 
-  // FUNZIONI PER GESTIRE L'APERTURA DELLA MODALE
   function openCreateModal(e: Event) {
     e.stopPropagation();
-    editTargetId = null; // Ci assicuriamo che sia null per la Creazione
+    editTargetId = null;
     istantiate = true;
   }
 
   function openEditModal() {
     if (selectedId && selectedType === 'node') {
       const nodeModel = ENode.fromId(selectedId);
+      
       if (nodeModel && nodeModel.getType() === "Module") {
         editTargetId = selectedId; 
         istantiate = true;
+      } else if (nodeModel && nodeModel.getType() === "Join") {
+        editTargetId = selectedId;
+        istantiateJoin = true;
       }
     }
   }
 
   function closeModal() {
     istantiate = false;
-    editTargetId = null; // Pulizia quando si chiude
+    editTargetId = null;
   }
 
-  // LOGICA DI SALVATAGGIO DISACCOPPIATA
   function handleSaveNode(data: any) {
     if (editTargetId) {
-      // Aggiornamento
       d.updateModule(
         editTargetId,
         data.stereotype,
@@ -133,7 +134,6 @@
         data.height
       );
     } else {
-      // Creazione: Calcoliamo il centro della view
       const coords = getCenterCoordinates();
       d.addModule(
         data.stereotype,
@@ -149,11 +149,25 @@
     closeModal();
   }
 
-  // Creazione di un Join al centro dello schermo
-  function newJoin() {
-    const coords = getCenterCoordinates();
-    // Usa il nuovo addJoin che accetta x e y come definito in precedenza
-    d.addJoin(coords.x, coords.y); 
+  function openJoinModal(e: Event) {
+    e.stopPropagation();
+    editTargetId = null; 
+    istantiateJoin = true;
+  }
+
+  function closeJoinModal() {
+    istantiateJoin = false;
+    editTargetId = null;
+  }
+
+  function handleSelectJoin(stereotype: any) {
+    if (editTargetId) {
+      d.updateJoin(editTargetId, stereotype);
+    } else {
+      const coords = getCenterCoordinates();
+      d.addJoin(stereotype, coords.x, coords.y);
+    }
+    closeJoinModal();
   }
 
   const nodeTypes = { Module: SLayer, Join: SJoin};
@@ -170,7 +184,7 @@
       class:active={selectedType === 'node'}>✏️ Modifica</button
     >
 
-    <button onclick={newJoin}>🔗 Inserisci Join</button> 
+    <button onclick={openJoinModal}>🔗 Inserisci Join</button> 
 
     <button
       onclick={deleteSelectedElement}
@@ -216,6 +230,32 @@
       </div>
 
       <button class="btn-close" onclick={closeModal}> Chiudi </button>
+    </div>
+  </div>
+{/if}
+
+{#if istantiateJoin}
+  <div class="modal-overlay" role="dialog">
+    <div class="modal-container" style="max-width: 400px; text-align: center;">
+      <div class="modal-body">
+        <h3 style="margin-bottom: 20px;">Seleziona il tipo di Join</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          {#each d.joins as joinStereotype}
+            <button 
+              class="join-option-btn" 
+              onclick={() => handleSelectJoin(joinStereotype)}
+              style="padding: 10px; font-size: 16px; cursor: pointer;"
+            >
+              {joinStereotype.name}
+            </button>
+          {/each}
+          
+          {#if d.joins.length === 0}
+            <p>Nessun Join trovato nella cartella.</p>
+          {/if}
+        </div>
+      </div>
+      <button class="btn-close" style="margin-top: 20px;" onclick={closeJoinModal}> Annulla </button>
     </div>
   </div>
 {/if}
