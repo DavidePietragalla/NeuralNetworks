@@ -12,6 +12,7 @@
   import SLayer from "../lib/components/SLayer.svelte";
   import SJoin  from "../lib/components/SJoin.svelte";
   import SConnection from "$lib/components/SConnection.svelte";
+  import SSubGraph from "../lib/components/SSubGraph.svelte";
   import { Diagram } from "$lib/diagram.svelte";
 
   import SIstantiator from "$lib/components/SIstantiator.svelte";
@@ -24,6 +25,9 @@
   } from "$lib/utils";
 
   import { ENode } from "$lib/model/node";
+  import { VNode } from "$lib/view/node";
+  import { type Node as FlowNode } from "@xyflow/svelte";
+  import type { NodeTargetEventWithPointer } from "@xyflow/svelte";
 
   let selectedId = $state<string | null>(null);
   let selectedType = $state<'node' | 'edge' | null>(null);
@@ -35,7 +39,7 @@
 
   let d = new Diagram();
 
-  const { screenToFlowPosition, getViewport } = useSvelteFlow();
+  const { screenToFlowPosition, getViewport, getIntersectingNodes } = useSvelteFlow();
   
   function getCenterCoordinates() {
     const wrapper = document.querySelector('.flow-wrapper');
@@ -83,12 +87,55 @@
   function handleNodeDoubleClick({ event, node }: any) {
     selectedId = node.id;
     selectedType = 'node';
-
     const nodeModel = ENode.fromId(node.id);
     
     if (nodeModel && nodeModel.getType() === "Module") {
       editTargetId = node.id;
       istantiate = true;
+    } else if (nodeModel && nodeModel.getType() === "SubGraph") {
+      const currentName = (nodeModel as any).name;
+      const newName = prompt("Modifica nome Sottoschema:", currentName);
+      if (newName && newName.trim() !== "") {
+        d.updateSubGraph(node.id, newName);
+      }
+    }
+  }
+
+  function handleNodeDragStop({ event, targetNode }: { event: MouseEvent | TouchEvent, targetNode: any }){
+    if (!targetNode || !targetNode.id) { 
+      return;
+    }
+
+    const intersections = getIntersectingNodes(targetNode).filter((n) => n.type === 'SubGraph');
+    const targetGroup = intersections[0];
+
+    const nodeIndex = d.nodes.findIndex((n: any) => n.id === targetNode.id);
+    if (nodeIndex === -1) return;
+
+    if (targetGroup && targetGroup.id !== targetNode.id) {
+      if (d.nodes[nodeIndex].parentId !== targetGroup.id) {
+        d.nodes[nodeIndex].parentId = targetGroup.id;
+        
+        d.nodes[nodeIndex].position = {
+          x: targetNode.position.x - targetGroup.position.x,
+          y: targetNode.position.y - targetGroup.position.y
+        };
+        d.nodes = [...d.nodes];
+      }
+    } else if (!targetGroup && d.nodes[nodeIndex].parentId) {
+      const oldParent = d.nodes.find((n: any) => n.id === d.nodes[nodeIndex].parentId);
+      
+      d.nodes[nodeIndex].parentId = undefined;
+      d.nodes[nodeIndex].extent = undefined;
+
+      if (oldParent) {
+        d.nodes[nodeIndex].position = {
+          x: targetNode.position.x + oldParent.position.x,
+          y: targetNode.position.y + oldParent.position.y
+        };
+      }
+      
+      d.nodes = [...d.nodes];
     }
   }
 
@@ -104,18 +151,24 @@
   }
 
   function openEditModal() {
-    if (selectedId && selectedType === 'node') {
-      const nodeModel = ENode.fromId(selectedId);
-      
-      if (nodeModel && nodeModel.getType() === "Module") {
-        editTargetId = selectedId; 
-        istantiate = true;
-      } else if (nodeModel && nodeModel.getType() === "Join") {
-        editTargetId = selectedId;
-        istantiateJoin = true;
+  if (selectedId && selectedType === 'node') {
+    const nodeModel = ENode.fromId(selectedId);
+    
+    if (nodeModel && nodeModel.getType() === "Module") {
+      editTargetId = selectedId; 
+      istantiate = true;
+    } else if (nodeModel && nodeModel.getType() === "Join") {
+      editTargetId = selectedId;
+      istantiateJoin = true;
+    } else if (nodeModel && nodeModel.getType() === "SubGraph") {
+      const currentName = (nodeModel as any).name;
+      const newName = prompt("Modifica nome Sottoschema:", currentName);
+      if (newName && newName.trim() !== "") {
+        d.updateSubGraph(selectedId, newName);
       }
     }
   }
+}
 
   function closeModal() {
     istantiate = false;
@@ -170,13 +223,23 @@
     closeJoinModal();
   }
 
-  const nodeTypes = { Module: SLayer, Join: SJoin};
+  function handleAddSubGraph() {
+    const name = prompt("Inserisci il nome del nuovo Schema:", "Nuovo Schema");
+    if (name) {
+      const coords = getCenterCoordinates();
+      d.addSubGraph(name, coords.x, coords.y);
+    }
+  }
+
+  const nodeTypes = { Module: SLayer, Join: SJoin, SubGraph: SSubGraph };
   const edgeTypes = { connection: SConnection };
 </script>
 
 <div class="app-container">
   <div class="toolbar">
     <button onclick={openCreateModal}>➕ Aggiungi Module</button>
+
+    <button onclick={handleAddSubGraph}>📦 Aggiungi SubGraph</button>
 
     <button
       onclick={openEditModal}
@@ -209,7 +272,8 @@
       onedgeclick={handleEdgeClick}
       onnodedoubleclick={handleNodeDoubleClick}
       onpaneclick={handlePaneClick}
-      {onconnect}
+      onconnect= {onconnect}
+      onnodedragstop={handleNodeDragStop}
     >
       <Controls />
       <Background variant={BackgroundVariant.Dots} />

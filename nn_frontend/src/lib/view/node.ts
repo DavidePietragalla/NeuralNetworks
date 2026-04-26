@@ -5,6 +5,10 @@ export class VNode {
   public position: { x: number; y: number };
   public data: Record<string, any>;
   public type: string;
+  
+  public parentId?: string;
+  public extent?: 'parent';
+  public style?: string;
 
   constructor(
     node: ENode,
@@ -12,7 +16,8 @@ export class VNode {
     y: number | null = null,
     color?: string,
     width?: string,
-    height?: string
+    height?: string,
+    parentId?: string
   ) {
     if (x === null || y === null) {
       x = Math.random() * 100;
@@ -22,13 +27,22 @@ export class VNode {
     this.position = { x, y };
     this.id = node.id;
     this.type = node.getType();
+    this.parentId = parentId;
+
+    if (parentId) {
+      this.extent = 'parent';
+    }
 
     this.data = {
       enode: node.id,
-      color: color || "#4779c4", // Blue 
+      color: color || "#4779c4",
       width: width || "100px",
       height: height || "60px",
       _tick: Date.now()
     };
+    
+    if (this.type === "SubGraph") {
+        this.style = "width: 400px; height: 300px; background-color: rgba(71, 121, 196, 0.1); border: 2px dashed #4779c4; z-index: -1;";
+    }
   }
 }

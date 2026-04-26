@@ -5,6 +5,7 @@ import { VNode } from "./view/node";
 import { Stereotype } from "./model/stereotype";
 import { JoinStereotype } from "./model/joinStereotype";
 import { Join } from "./model/join";
+import { SubGraph } from "./model/subgraph";
 
 export class Diagram {
   public stereotypes: Array<Stereotype> = [];
@@ -187,6 +188,30 @@ export class Diagram {
       }
       return node;
     });
+  }
+
+  public addSubGraph(name: string, x: number, y: number) {
+    const sub = new SubGraph(name);
+
+    const vNode = new VNode(sub, x, y);
+    
+    this.nodes = [...this.nodes, vNode];
+  }
+
+  public updateSubGraph(id: string, newName: string) {
+    const sub = ENode.fromId(id) as SubGraph;
+    if (sub) {
+      sub.name = newName;
+      
+      const vNodeIndex = this.nodes.findIndex(n => n.id === id);
+      if (vNodeIndex !== -1) {
+        this.nodes[vNodeIndex].data = { 
+          ...this.nodes[vNodeIndex].data, 
+          _tick: Date.now() 
+        };
+        this.nodes = [...this.nodes];
+      }
+    }
   }
 
   public exportSequentialGraph(): string {
