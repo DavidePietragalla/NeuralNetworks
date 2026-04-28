@@ -224,18 +224,32 @@
     closeJoinModal();
   }
 
-  function handleAddSubGraph() {
+  function handleAddSubGraph(): VNode | null {
     const name = prompt("Inserisci il nome del nuovo Schema:", "Nuovo Schema");
     if (name) {
       const coords = getCenterCoordinates();
-      d.addSubGraph(name, coords.x, coords.y);
+      return d.addSubGraph(name, coords.x, coords.y);
     }
+    return null
   }
 
-  function handleloadFromFile(e: Event) {
+  function openImportModal(e: Event) {
     e.stopPropagation(); 
     instantiateImport = true;
-    loadFromFile(d);
+  }
+
+  function closeImportModal() {
+    instantiateImport = false;
+  }
+
+  function handleImportFromJson(mode: string) {
+    if (mode === "subgraph") {
+      loadFromFile(d, handleAddSubGraph());
+    } else {
+      loadFromFile(d);
+    }
+    
+    closeImportModal();
   }
 
   const nodeTypes = { Module: SLayer, Join: SJoin, SubGraph: SSubGraph };
@@ -264,7 +278,7 @@
 
     <div class="divider"></div>
     <button onclick={() => exportToJson(d)}>💾 Esporta JSON</button>
-    <button onclick={handleloadFromFile}>📂 Carica JSON</button>
+    <button onclick={openImportModal}>📂 Carica JSON</button>
     <button onclick={() => convert(d)}>💾 Converti </button>
   </div>
 
@@ -313,10 +327,17 @@
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <button 
               class="join-option-btn" 
-              onclick={}
+              onclick={() =>handleImportFromJson("subgraph")}
               style="padding: 10px; font-size: 16px; cursor: pointer;"
             >
               {"Sottografo"}
+            </button>
+            <button 
+              class="join-option-btn" 
+              onclick={() =>handleImportFromJson("diagram")}
+              style="padding: 10px; font-size: 16px; cursor: pointer;"
+            >
+              {"Diagramma"}
             </button>
         </div>
       </div>

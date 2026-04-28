@@ -196,6 +196,8 @@ export class Diagram {
     const vNode = new VNode(sub, x, y);
 
     this.nodes = [...this.nodes, vNode];
+
+    return vNode;
   }
 
   public updateSubGraph(id: string, newName: string) {
@@ -212,73 +214,5 @@ export class Diagram {
         this.nodes = [...this.nodes];
       }
     }
-  }
-
-  public exportSequentialGraph(): string {
-    // Cerchiamo tra tutti gli ENode quello che ha categoria "input"
-    let currentNode = Array.from(ENode.allNodes.values()).find(
-      (n) => (n as Module).stereotype.category.toLowerCase() === "input"
-    );
-
-    if (!currentNode) {
-      throw new Error("Nodo di Input non trovato. Impossibile generare la sequenza.");
-    }
-
-    const sequence: any[] = new Tree();
-    let step = 0;
-    let loss: Object | null = null;
-    // Navighiamo il grafo sequenzialmente
-    while (currentNode) {
-      console.log(currentNode);
-      if (currentNode.getType() === "Module") {
-        const mod = currentNode as Module;
-
-        // Ignoriamo l'Input stesso nella lista finale di PyTorch (o lo teniamo se ti serve per i config)
-        if (mod.stereotype.category.toLocaleLowerCase().includes("loss")) {
-          if (loss !== null) {
-            throw new Error("Trovata più di una loss. Impossibile continuare");
-          }
-          const paramsObj: Record<string, any> = {};
-
-          mod.params.forEach(p => {
-            // Manteniamo il valore testuale per ora, lo parseremo in Python
-            paramsObj[p.name] = {
-              value: p.value,
-              type: p.type,
-            };
-          });
-          loss = {
-            id: `loss_${step}`,
-            name: mod.name,
-            target: mod.stereotype.pythonClassName, // es: "nn.Conv2d"
-            params: paramsObj
-          };
-        } else if (mod.stereotype.category.toLowerCase() !== "input") {
-          const paramsObj: Record<string, any> = {};
-
-          mod.params.forEach(p => {
-            // Manteniamo il valore testuale per ora, lo parseremo in Python
-            paramsObj[p.name] = {
-              value: p.value,
-              type: p.type,
-            };
-          });
-
-          sequence.push({
-            id: `layer_${step}`,
-            name: mod.name,
-            target: mod.stereotype.pythonClassName, // es: "nn.Conv2d"
-            params: paramsObj
-          });
-
-          step++;
-        }
-      }
-
-      // 3. Passiamo al nodo successivo (assumendo che ce ne sia solo uno)
-      currentNode = currentNode.next_nodes.length > 0 ? ENode.fromId(currentNode.next_nodes[0]) : undefined;
-    }
-
-    return JSON.stringify({ network: sequence, loss: loss }, null, 2);
   }
 }

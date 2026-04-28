@@ -5,7 +5,6 @@ import { Join } from "./model/join";
 import { Module } from "./model/module";
 import type { VNode } from "./view/node";
 
-<<<<<<< HEAD
 export async function loadSubGraphFromFile(d: Diagram) {
   try {
     let jsonString = "";
@@ -56,10 +55,7 @@ export async function loadSubGraphFromFile(d: Diagram) {
 }
 
 
-export async function loadFromFile(d: Diagram) {
-=======
 export async function loadFromFile(d: Diagram, subgraph: VNode | null = null) {
->>>>>>> loadingsubgraph
   try {
     let jsonString = "";
 
