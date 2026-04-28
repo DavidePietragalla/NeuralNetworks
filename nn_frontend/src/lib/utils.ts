@@ -3,8 +3,9 @@ import { ENode } from "./model/node";
 import { NNTree } from "./model/nntree";
 import { Join } from "./model/join";
 import { Module } from "./model/module";
+import type { VNode } from "./view/node";
 
-export async function loadFromFile(d: Diagram) {
+export async function loadFromFile(d: Diagram, subgraph: VNode | null = null) {
   try {
     let jsonString = "";
 
@@ -44,7 +45,7 @@ export async function loadFromFile(d: Diagram) {
     }
 
     // Passa il testo letto alla funzione di importazione
-    importFromJson(d, jsonString);
+    importFromJson(d, jsonString, subgraph);
   } catch (error: any) {
     if (error.name !== "AbortError") {
       console.error("Errore durante l'apertura del file:", error);
@@ -127,7 +128,7 @@ export async function exportToJson(d: Diagram) {
   await saveToFile(jsonString);
 }
 
-export function importFromJson(d: Diagram, jsonString: string) {
+export function importFromJson(d: Diagram, jsonString: string, subgraph: VNode | null = null) {
   try {
     const parsedData = JSON.parse(jsonString);
 
@@ -138,31 +139,34 @@ export function importFromJson(d: Diagram, jsonString: string) {
     }
 
     // 1. Ripristina i nodi e gli archi visuali di SvelteFlow
-    d.nodes = parsedData.view.nodes || [];
+    // Applichiamo la logica sul parentId in base al flag 'subgraph'
+    const rawNodes = parsedData.view.nodes || [];
+    d.nodes = rawNodes.map((node: any) => ({
+      ...node,
+      parentId: subgraph ? subgraph.parentId : "" 
+    }));
+
     d.edges = parsedData.view.edges || [];
 
-    // 2. Ripristina il dizionario (Map) in backend (ENode.allNodes)
-    ENode.allNodes.clear();
+    // 2. Ripristina i dati del modello logico
     for (const [key, value] of Object.entries(parsedData.model)) {
-      // Nota: Questo inserisce i dati raw. Se i tuoi ENode/Module usano metodi di classe
-      // (es. add_next_node), i dati andrebbero re-istanziati tramite "new Module(...)".
       const rawNode = value as any;
-      // TODO: distiguere tra le varie sottoclassi di Enode
+      
       console.log(`Loading node ${key}: next_nodes=${JSON.stringify(rawNode.next_nodes || [])}`);
+      
+      // Impostazione del prototipo in base alla struttura
       Object.setPrototypeOf(rawNode, ENode.prototype);
-
       if (rawNode.numberOfInputs) {
         Object.setPrototypeOf(rawNode, Join.prototype);
       } else {
         Object.setPrototypeOf(rawNode, Module.prototype);
       }
-
+      
       ENode.allNodes.set(key, rawNode);
     }
 
     // 3. Aggiorna il contatore interno per evitare conflitti con i nuovi ID
     if (d.nodes.length > 0) {
-      // Estrapola i numeri dagli ID (es. da "Module_4" prende 4)
       const ids = d.nodes
         .map((n) => {
           const parts = n.id.split("_");

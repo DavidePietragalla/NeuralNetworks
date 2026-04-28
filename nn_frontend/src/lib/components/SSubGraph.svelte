@@ -28,15 +28,11 @@
   tabindex="0"
   onkeydown={handleKeyDown}
 >
-  <Handle type="target" position={Position.Top} />
-
   <div class="subgraph-header">
     {nodeName}
   </div>
 
   <div class="subgraph-body"></div>
-
-  <Handle type="source" position={Position.Bottom} />
 </div>
 
 <style>

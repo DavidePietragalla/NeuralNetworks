@@ -34,6 +34,7 @@
 
   let istantiate: boolean = $state(false);
   let istantiateJoin: boolean = $state(false);
+  let instantiateImport: boolean = $state(false);
 
   let editTargetId = $state<string | null>(null);
 
@@ -147,7 +148,7 @@
   function openCreateModal(e: Event) {
     e.stopPropagation();
     editTargetId = null;
-    istantiate = true;
+    instantiateImport = true;
   }
 
   function openEditModal() {
@@ -231,6 +232,12 @@
     }
   }
 
+  function handleloadFromFile(e: Event) {
+    e.stopPropagation(); 
+    instantiateImport = true;
+    loadFromFile(d);
+  }
+
   const nodeTypes = { Module: SLayer, Join: SJoin, SubGraph: SSubGraph };
   const edgeTypes = { connection: SConnection };
 </script>
@@ -257,7 +264,7 @@
 
     <div class="divider"></div>
     <button onclick={() => exportToJson(d)}>💾 Esporta JSON</button>
-    <button onclick={() => loadFromFile(d)}>📂 Carica JSON</button>
+    <button onclick={handleloadFromFile}>📂 Carica JSON</button>
     <button onclick={() => convert(d)}>💾 Converti </button>
   </div>
 
@@ -294,6 +301,26 @@
       </div>
 
       <button class="btn-close" onclick={closeModal}> Chiudi </button>
+    </div>
+  </div>
+{/if}
+
+{#if instantiateImport}
+  <div class="modal-overlay" role="dialog">
+    <div class="modal-container" style="max-width: 400px; text-align: center;">
+      <div class="modal-body">
+        <h3 style="margin-bottom: 20px;">In che formato vuoi importare il diagramma?</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button 
+              class="join-option-btn" 
+              onclick={}
+              style="padding: 10px; font-size: 16px; cursor: pointer;"
+            >
+              {"Sottografo"}
+            </button>
+        </div>
+      </div>
+      <button class="btn-close" style="margin-top: 20px;" onclick={closeJoinModal}> Annulla </button>
     </div>
   </div>
 {/if}
