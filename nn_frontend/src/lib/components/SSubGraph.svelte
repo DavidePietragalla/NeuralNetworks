@@ -4,7 +4,7 @@
   import { SubGraph } from "$lib/model/subgraph";
 
   let { id, data, selected }: NodeProps = $props();
-  
+
   let subGraph = $derived(ENode.fromId(data.enode as string) as SubGraph);
   let nodeName = $derived((data._tick, subGraph?.name || "SubGraph"));
 
@@ -64,3 +64,4 @@
     flex-grow: 1;
   }
 </style>
+

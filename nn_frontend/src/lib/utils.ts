@@ -4,6 +4,56 @@ import { NNTree } from "./model/nntree";
 import { Join } from "./model/join";
 import { Module } from "./model/module";
 
+export async function loadSubGraphFromFile(d: Diagram) {
+  try {
+    let jsonString = "";
+
+    // 1. Prova a usare la File System Access API
+    if ("showOpenFilePicker" in window) {
+      const [fileHandle] = await (window as any).showOpenFilePicker({
+        types: [
+          {
+            description: "JSON Configuration File",
+            accept: { "application/json": [".json"] },
+          },
+        ],
+        multiple: false,
+      });
+
+      const file = await fileHandle.getFile();
+      jsonString = await file.text();
+    }
+    // 2. Fallback classico tramite input file invisibile
+    else {
+      jsonString = await new Promise((resolve, reject) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+
+        input.onchange = async (e: any) => {
+          const file = e.target.files[0];
+          if (file) {
+            resolve(await file.text());
+          } else {
+            reject(new Error("Nessun file selezionato"));
+          }
+        };
+
+        input.click();
+      });
+    }
+
+    // Passa il testo letto alla funzione di importazione
+    importFromJson(d, jsonString);
+  } catch (error: any) {
+    if (error.name !== "AbortError") {
+      console.error("Errore durante l'apertura del file:", error);
+      alert("Si è verificato un errore durante il caricamento.");
+    }
+  }
+}
+
+
 export async function loadFromFile(d: Diagram) {
   try {
     let jsonString = "";
@@ -53,7 +103,7 @@ export async function loadFromFile(d: Diagram) {
   }
 }
 
-async function saveToFile(jsonString: string) {
+async function saveToFile(d: Diagram, jsonString: string) {
   try {
     // 2. Prova a usare la File System Access API (Apre il popup di salvataggio nativo)
     if (window.showSaveFilePicker) {
