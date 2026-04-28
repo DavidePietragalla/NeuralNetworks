@@ -194,7 +194,7 @@ export class Diagram {
     const sub = new SubGraph(name);
 
     const vNode = new VNode(sub, x, y);
-    
+
     this.nodes = [...this.nodes, vNode];
   }
 
@@ -202,12 +202,12 @@ export class Diagram {
     const sub = ENode.fromId(id) as SubGraph;
     if (sub) {
       sub.name = newName;
-      
+
       const vNodeIndex = this.nodes.findIndex(n => n.id === id);
       if (vNodeIndex !== -1) {
-        this.nodes[vNodeIndex].data = { 
-          ...this.nodes[vNodeIndex].data, 
-          _tick: Date.now() 
+        this.nodes[vNodeIndex].data = {
+          ...this.nodes[vNodeIndex].data,
+          _tick: Date.now()
         };
         this.nodes = [...this.nodes];
       }

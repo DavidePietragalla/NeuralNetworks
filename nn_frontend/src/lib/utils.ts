@@ -103,7 +103,7 @@ export async function loadFromFile(d: Diagram) {
   }
 }
 
-async function saveToFile(d: Diagram, jsonString: string) {
+async function saveToFile(jsonString: string) {
   try {
     // 2. Prova a usare la File System Access API (Apre il popup di salvataggio nativo)
     if (window.showSaveFilePicker) {
