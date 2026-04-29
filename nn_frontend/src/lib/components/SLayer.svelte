@@ -8,12 +8,13 @@
     type NodeProps
   } from "@xyflow/svelte";
 
-  let { id, data, selected }: NodeProps = $props();
+  let { id, data, selected, width, height }: NodeProps = $props();
 
   let moduleNode = $derived(ENode.fromId(data.enode as string) as Module | undefined);
   let nodeColor = $derived(data.color || "#4779c4");
-  let nodeWidth = $derived(data.width || "100px");
-  let nodeHeight = $derived(data.height || "60px");
+  // Use node's width/height if provided, otherwise fall back to data
+  let nodeWidth = $derived((width && `${width}px`) || data.width || "100px");
+  let nodeHeight = $derived((height && `${height}px`) || data.height || "60px");
 
   let nodeName = $derived((data._tick, moduleNode?.name));
   // let isSubgraph = $derived((data._tick, l.getType() === "SubGraph"));
@@ -104,13 +105,13 @@
 
       <NodeResizer
         color="#ff0072"
+        onResize={(event: any) => {
+          // Update data dimensions during resize (not just at end)
+          data.width = `${event.width}px`;
+          data.height = `${event.height}px`;
+        }}
         onResizeEnd={(event: any) => {
-          console.log('Node resized:', event);
-          const { width, height } = event;
-          // Update node dimensions in data
-          data.width = `${width}px`;
-          data.height = `${height}px`;
-          // Trigger reactivity
+          // Trigger reactivity after resize ends
           data._tick = Date.now();
         }}
       />

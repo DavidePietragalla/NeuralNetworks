@@ -8,7 +8,7 @@
   import { ENode } from "$lib/model/node";
   import { SubGraph } from "$lib/model/subgraph";
 
-  let { id, data, selected }: NodeProps = $props();
+  let { id, data, selected, width, height }: NodeProps = $props();
 
   let subGraph = $derived(ENode.fromId(data.enode as string) as SubGraph);
   let nodeName = $derived((data._tick, subGraph?.name || "SubGraph"));
@@ -42,13 +42,11 @@
 
   <NodeResizer
     color="#ff0072"
+    onResize={(event: any) => {
+      data.width = `${event.width}px`;
+      data.height = `${event.height}px`;
+    }}
     onResizeEnd={(event: any) => {
-      console.log('SubGraph resized:', event);
-      const { width, height } = event;
-      // Update node dimensions in data
-      data.width = `${width}px`;
-      data.height = `${height}px`;
-      // Trigger reactivity
       data._tick = Date.now();
     }}
   />

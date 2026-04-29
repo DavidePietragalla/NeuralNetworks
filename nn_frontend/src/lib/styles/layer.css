@@ -24,6 +24,11 @@
   color: white;
 }
 
+/* Hide resize handles when node is not selected */
+.node-wrapper:not(.selected) .svelte-flow__resize-control {
+  display: none;
+}
+
 .custom-node.selected {
   border-color: white;
   /* Se vuoi, puoi far diventare l'outline dello stesso colore del nodo! */
