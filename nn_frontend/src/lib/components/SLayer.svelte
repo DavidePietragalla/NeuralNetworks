@@ -5,7 +5,7 @@
     Handle,
     Position,
     NodeResizer,
-    useInternalNode,
+    useStore,
     type NodeProps
   } from "@xyflow/svelte";
 
@@ -14,22 +14,26 @@
   let moduleNode = $derived(ENode.fromId(data.enode as string) as Module | undefined);
   let nodeColor = $derived(data.color || "#4779c4");
 
-  // Get the actual node from the store to access its width/height
-  let internalNode = $derived(useInternalNode(id));
+  // Get the store to access the current node dimensions
+  let store = useStore();
   
-  // Use the node's width/height if available (numbers from SvelteFlow store)
-  // Otherwise fall back to data (strings) or defaults
+  // Use the store's node dimensions (updated by NodeResizer)
+  // The store's nodes array is reactive, so derived values will update
+  let currentNode = $derived(store.nodes.find(n => n.id === id));
+  
+  // Use the node's width/height from the store (numbers), convert to px strings
+  // Fall back to data if not available
   let nodeWidth = $derived.by(() => {
-    const nodeWidthNum = internalNode.current?.width;
-    if (nodeWidthNum !== undefined) {
+    const nodeWidthNum = currentNode?.width;
+    if (nodeWidthNum !== undefined && nodeWidthNum !== null) {
       return `${nodeWidthNum}px`;
     }
     return data.width || "100px";
   });
   
   let nodeHeight = $derived.by(() => {
-    const nodeHeightNum = internalNode.current?.height;
-    if (nodeHeightNum !== undefined) {
+    const nodeHeightNum = currentNode?.height;
+    if (nodeHeightNum !== undefined && nodeHeightNum !== null) {
       return `${nodeHeightNum}px`;
     }
     return data.height || "60px";
@@ -124,10 +128,6 @@
 
       <NodeResizer
         color="#ff0072"
-        onResizeEnd={(event: any) => {
-          // Trigger reactivity after resize ends
-          data._tick = Date.now();
-        }}
       />
     </div>
   {/if}

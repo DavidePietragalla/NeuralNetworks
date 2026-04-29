@@ -3,7 +3,7 @@
     Handle,
     Position,
     NodeResizer,
-    useInternalNode,
+    useStore,
     type NodeProps
   } from "@xyflow/svelte";
   import { ENode } from "$lib/model/node";
@@ -13,20 +13,23 @@
 
   let subGraph = $derived(ENode.fromId(data.enode as string) as SubGraph);
   
-  // Get the actual node from the store to access its width/height
-  let internalNode = $derived(useInternalNode(id));
+  // Get the store to access the current node dimensions
+  let store = useStore();
+  
+  // Use the store's node dimensions (updated by NodeResizer)
+  let currentNode = $derived(store.nodes.find(n => n.id === id));
   
   let subGraphWidth = $derived.by(() => {
-    const nodeWidth = internalNode.current?.width;
-    if (nodeWidth !== undefined) {
+    const nodeWidth = currentNode?.width;
+    if (nodeWidth !== undefined && nodeWidth !== null) {
       return `${nodeWidth}px`;
     }
     return data.width || "400px";
   });
   
   let subGraphHeight = $derived.by(() => {
-    const nodeHeight = internalNode.current?.height;
-    if (nodeHeight !== undefined) {
+    const nodeHeight = currentNode?.height;
+    if (nodeHeight !== undefined && nodeHeight !== null) {
       return `${nodeHeight}px`;
     }
     return data.height || "300px";
@@ -63,10 +66,6 @@
 
   <NodeResizer
     color="#ff0072"
-    onResizeEnd={(event: any) => {
-      // Trigger reactivity after resize ends
-      data._tick = Date.now();
-    }}
   />
 </div>
 
