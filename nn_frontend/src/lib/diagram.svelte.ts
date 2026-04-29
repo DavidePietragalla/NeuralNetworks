@@ -218,6 +218,7 @@ export class Diagram {
   }
 
   public addENodeWithEdges(module: ENode, vnode: VNode, edges: any[], subname: string) {
+    // Pass idMapping if available (for subgraph loading)
     console.log("addENodeWithEdges");
     ENode.allNodes.set(module.id, module); // inserito nel modello
     this.nodes = [...this.nodes, vnode]; // inserito nella view
@@ -226,9 +227,13 @@ export class Diagram {
       // The edge.source and edge.target are relative IDs (e.g., "ENode_1")
       // We need to find the actual edges from the raw edges data
       console.log(`Adding edge: source=${module.id}, target=${subname}_${edge.target}`);
+      
+      // For edges within the subgraph, target might have been prefixed already
+      const edgeTarget = edge.target;
+      
       this.addConnection({
         source: module.id,
-        target: `${subname}_${edge.target}`,
+        target: edgeTarget,
         target_handle: edge.target_handle // TODO: aggiungere per i join
       });
     }

@@ -5,6 +5,7 @@ import { Join } from "./model/join";
 import { Module } from "./model/module";
 import type { VNode } from "./view/node";
 import { SubGraph } from "./model/subgraph";
+import { MarkerType } from '@xyflow/svelte';
 
 
 export async function loadFromFile(d: Diagram, subgraph: VNode | null = null) {
@@ -172,7 +173,7 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
 
     filteredNodes.map((node: any) => ({
       ...node,
-      parentId: subgraph.parentId
+      parentId: subgraph.id  // Bind nodes to subgraph (not subgraph.parentId)
     })).forEach((vnodeRaw: any) => {
       let enodeRaw = parsedData.model[vnodeRaw.id];
       let oldId = vnodeRaw.id;
@@ -194,12 +195,23 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
       modifiedENode.push(enodeRaw);
     });
 
-    // d.edges = parsedData.view.edges || [];
+    // Store raw edges for edge matching later
+    const rawEdges = parsedData.view.edges || [];
 
     console.log("filter done")
 
     // Create a map of subgraph node IDs for fast lookup
     const subgraphNodeIds = new Set(modifiedVNodes.keys());
+
+    // Create a mapping from original IDs to new IDs for edge matching
+    const idMapping = new Map<string, string>();
+    modifiedVNodes.forEach((vnode: any) => {
+      // Extract original ID by removing subgraph prefix
+      const originalId = vnode.id.replace(`${subgraph.id}_`, "");
+      idMapping.set(originalId, vnode.id);
+    });
+
+    console.log("idMapping:", Object.fromEntries(idMapping));
 
     // 2. Ripristina i dati del modello logico
     for (const value of modifiedENode) {
@@ -222,27 +234,63 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
         Object.setPrototypeOf(rawNode, Join.prototype);
         let joinNode: Join = rawNode;
         // Filter edges that originate from this subgraph node
-        d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), parsedData.view.edges.filter(
-          (edge: any) => {
-            // Edge source is in the set of subgraph node IDs (with prefix)
-            return edge.source === joinNode.id;
-          }
-        ), subgraph.id);
+        // Use the mapping to find edges with original IDs
+        const matchingEdges = rawEdges.filter((edge: any) => {
+          // Check if edge.source matches this node's original ID (before prefix)
+          const originalSourceId = edge.source.replace(`${subgraph.id}_`, "");
+          const nodeOriginalId = joinNode.id.replace(`${subgraph.id}_`, "");
+          return edge.source === nodeOriginalId;
+        });
+        console.log(`Join ${joinNode.id} matching edges:`, matchingEdges);
+        d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), matchingEdges, subgraph.id);
       } else {
         // caso Module
         Object.setPrototypeOf(rawNode, Module.prototype);
         let mod: Module = rawNode;
 
-        d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), parsedData.view.edges.filter(
-          (edge: any) => {
-            // Edge source is in the set of subgraph node IDs (with prefix)
-            return edge.source === mod.id;
-          }
-        ), subgraph.id);
+        // Filter edges that originate from this subgraph node
+        // Use the mapping to find edges with original IDs
+        const matchingEdges = rawEdges.filter((edge: any) => {
+          // Check if edge.source matches this node's original ID (before prefix)
+          const originalSourceId = edge.source.replace(`${subgraph.id}_`, "");
+          const nodeOriginalId = mod.id.replace(`${subgraph.id}_`, "");
+          return edge.source === nodeOriginalId;
+        });
+        console.log(`Module ${mod.id} matching edges:`, matchingEdges);
+        d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), matchingEdges, subgraph.id);
       }
       // TODO: controlla che l'Id non esista
     }
     console.log("Importazione completata con successo!");
+    
+    // Add all edges from the subgraph to the diagram
+    // Edges use original IDs, so we need to prefix them for the diagram
+    for (const edge of rawEdges) {
+      const originalSource = edge.source;
+      const originalTarget = edge.target;
+      
+      // Check if source and target are in the subgraph (have the subgraph prefix)
+      const sourceInSubgraph = subgraphNodeIds.has(`${subgraph.id}_${originalSource}`);
+      const targetInSubgraph = subgraphNodeIds.has(`${subgraph.id}_${originalTarget}`);
+      
+      if (sourceInSubgraph && targetInSubgraph) {
+        // Both nodes are in the subgraph - add edge with prefixed IDs
+        d.edges.push({
+          id: `e-${subgraph.id}_${originalSource}-${subgraph.id}_${originalTarget}`,
+          source: `${subgraph.id}_${originalSource}`,
+          target: `${subgraph.id}_${originalTarget}`,
+          type: 'connection',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 10,
+            height: 15,
+            color: '#27b376',
+          },
+          style: 'stroke: #27b376; stroke-width: 2;'
+        });
+      }
+    }
+    console.log("Edges added to diagram:", d.edges.length);
   } catch (error) {
     console.error("Errore durante il parsing del JSON:", error);
     alert("Il JSON fornito non è valido o è incompatibile.");
