@@ -4,55 +4,7 @@ import { NNTree } from "./model/nntree";
 import { Join } from "./model/join";
 import { Module } from "./model/module";
 import type { VNode } from "./view/node";
-
-export async function loadSubGraphFromFile(d: Diagram) {
-  try {
-    let jsonString = "";
-
-    // 1. Prova a usare la File System Access API
-    if ("showOpenFilePicker" in window) {
-      const [fileHandle] = await (window as any).showOpenFilePicker({
-        types: [
-          {
-            description: "JSON Configuration File",
-            accept: { "application/json": [".json"] },
-          },
-        ],
-        multiple: false,
-      });
-
-      const file = await fileHandle.getFile();
-      jsonString = await file.text();
-    }
-    // 2. Fallback classico tramite input file invisibile
-    else {
-      jsonString = await new Promise((resolve, reject) => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".json";
-
-        input.onchange = async (e: any) => {
-          const file = e.target.files[0];
-          if (file) {
-            resolve(await file.text());
-          } else {
-            reject(new Error("Nessun file selezionato"));
-          }
-        };
-
-        input.click();
-      });
-    }
-
-    // Passa il testo letto alla funzione di importazione
-    importFromJson(d, jsonString);
-  } catch (error: any) {
-    if (error.name !== "AbortError") {
-      console.error("Errore durante l'apertura del file:", error);
-      alert("Si è verificato un errore durante il caricamento.");
-    }
-  }
-}
+import { SubGraph } from "./model/subgraph";
 
 
 export async function loadFromFile(d: Diagram, subgraph: VNode | null = null) {
@@ -95,7 +47,13 @@ export async function loadFromFile(d: Diagram, subgraph: VNode | null = null) {
     }
 
     // Passa il testo letto alla funzione di importazione
-    importFromJson(d, jsonString, subgraph);
+    if (subgraph !== null) {
+      console.log("Istanziazione sottografo")
+      loadJsonAsSubGraph(d, jsonString, subgraph);
+    } else {
+      console.log("APERTURA FILE")
+      importFromJson(d, jsonString);
+    }
   } catch (error: any) {
     if (error.name !== "AbortError") {
       console.error("Errore durante l'apertura del file:", error);
@@ -178,7 +136,107 @@ export async function exportToJson(d: Diagram) {
   await saveToFile(jsonString);
 }
 
-export function importFromJson(d: Diagram, jsonString: string, subgraph: VNode | null = null) {
+export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNode) {
+  try {
+    const parsedData = JSON.parse(jsonString);
+    console.log("inizio funzione")
+    if (!parsedData.view || !parsedData.model) {
+      throw new Error(
+        "Il file JSON non ha la struttura attesa (mancano model o view).",
+      );
+    }
+
+    // 1. Ripristina i nodi e gli archi visuali di SvelteFlow
+    // Applichiamo la logica sul parentId in base al flag 'subgraph'
+    let modifiedVNodes: Map<string, any> = new Map();
+    let modifiedENode: any[] = [];
+
+    // parseData.view.edges
+
+    let rawNodes = parsedData.view.nodes || [];
+
+    console.log("rawNodes", rawNodes);
+    console.log("Model: ", parsedData.model);
+    let filteredNodes = rawNodes.filter((node: any) => {
+      return parsedData.model[node.id].stereotypeName !== "Input"; /* && TODO: filter of the loss */
+    });
+    //
+    // let filteredNodes = rawNodes;
+
+    rawNodes.forEach((node: any) => {
+      console.log(parsedData.model[node.id].stereotypeName); /* && TODO: filter of the loss */
+    });
+
+    console.log("filteredNodes: ", filteredNodes);
+
+    filteredNodes.map((node: any) => ({
+      ...node,
+      parentId: subgraph.parentId
+    })).forEach((vnodeRaw: any) => {
+      let enodeRaw = parsedData.model[vnodeRaw.id];
+      vnodeRaw.id = `${subgraph.id}_${vnodeRaw.id}`;
+      enodeRaw.id = vnodeRaw.id;
+      let new_nexts = [];
+      for (const key of enodeRaw.next_nodes) {
+        new_nexts.push(`${subgraph.id}_${key}`);
+      }
+      // TODO: gestire subgraph
+      enodeRaw.next_nodes = new_nexts; // TODO: gli id potrebbero avere nomi assurdi
+
+      modifiedVNodes.set(vnodeRaw.id, vnodeRaw);
+      modifiedENode.push(enodeRaw);
+    });
+
+    // d.edges = parsedData.view.edges || [];
+
+    console.log("filter done")
+
+    // 2. Ripristina i dati del modello logico
+    for (const value of modifiedENode) {
+      const rawNode = value as any;
+
+      console.log(`Loading node ${rawNode.id}: next_nodes=${JSON.stringify(rawNode.next_nodes || [])}`);
+      console.log(`node: `, rawNode);
+      if (rawNode.stereotype === undefined) console.log("OH NO!")
+      if (rawNode.stereotype !== undefined) console.log("OH Si!", rawNode.stereotype)
+      // Impostazione del prototipo in base alla struttura
+      Object.setPrototypeOf(rawNode, ENode.prototype);
+      // console.log(`Esecuzione ${value.id} numberOfInputs`);
+      if (rawNode.childrenIds !== undefined) {
+        // caso subgraph
+        // TODO: implement
+        Object.setPrototypeOf(rawNode, SubGraph);
+      } else if (rawNode.numberOfInputs) {
+        // caso Join
+        console.log("numberOfInputs");
+        Object.setPrototypeOf(rawNode, Join.prototype);
+        let joinNode: Join = rawNode;
+        d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), parsedData.view.edges.filter(
+          (edge: any) => {
+            return edge.source == joinNode.id.split("_")[1];
+          }
+        ), subgraph.id);
+      } else {
+        // caso Module
+        Object.setPrototypeOf(rawNode, Module.prototype);
+        let mod: Module = rawNode;
+
+        d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), parsedData.view.edges.filter(
+          (edge: any) => {
+            return edge.source == mod.id.split("_")[1];
+          }
+        ), subgraph.id);
+      }
+      // TODO: controlla che l'Id non esista
+    }
+    console.log("Importazione completata con successo!");
+  } catch (error) {
+    console.error("Errore durante il parsing del JSON:", error);
+    alert("Il JSON fornito non è valido o è incompatibile.");
+  }
+}
+
+export function importFromJson(d: Diagram, jsonString: string) {
   try {
     const parsedData = JSON.parse(jsonString);
 
@@ -193,7 +251,7 @@ export function importFromJson(d: Diagram, jsonString: string, subgraph: VNode |
     const rawNodes = parsedData.view.nodes || [];
     d.nodes = rawNodes.map((node: any) => ({
       ...node,
-      parentId: subgraph ? subgraph.parentId : "" 
+      parentId: ""
     }));
 
     d.edges = parsedData.view.edges || [];
@@ -201,17 +259,22 @@ export function importFromJson(d: Diagram, jsonString: string, subgraph: VNode |
     // 2. Ripristina i dati del modello logico
     for (const [key, value] of Object.entries(parsedData.model)) {
       const rawNode = value as any;
-      
+
       console.log(`Loading node ${key}: next_nodes=${JSON.stringify(rawNode.next_nodes || [])}`);
-      
+
       // Impostazione del prototipo in base alla struttura
       Object.setPrototypeOf(rawNode, ENode.prototype);
-      if (rawNode.numberOfInputs) {
+
+      if (rawNode.childrenIds !== undefined) {
+        // caso subgraph
+        // TODO: implement
+        Object.setPrototypeOf(rawNode, SubGraph.prototype);
+      } else if (rawNode.numberOfInputs) {
         Object.setPrototypeOf(rawNode, Join.prototype);
       } else {
         Object.setPrototypeOf(rawNode, Module.prototype);
       }
-      
+
       ENode.allNodes.set(key, rawNode);
     }
 

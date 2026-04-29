@@ -2,7 +2,7 @@ import { ENode } from "./node";
 
 export class SubGraph extends ENode {
   public name: string;
-  public childrenIds: string[] = []; 
+  public childrenIds: string[] = [];
 
   constructor(name: string = "SubGraph") {
     super();
@@ -11,5 +11,9 @@ export class SubGraph extends ENode {
 
   getType(): string {
     return "SubGraph";
+  }
+
+  getName(): string {
+    return this.name;
   }
 }

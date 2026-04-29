@@ -10,7 +10,7 @@
   import "@xyflow/svelte/dist/style.css";
 
   import SLayer from "../lib/components/SLayer.svelte";
-  import SJoin  from "../lib/components/SJoin.svelte";
+  import SJoin from "../lib/components/SJoin.svelte";
   import SConnection from "$lib/components/SConnection.svelte";
   import SSubGraph from "../lib/components/SSubGraph.svelte";
   import { Diagram } from "$lib/diagram.svelte";
@@ -30,7 +30,7 @@
   import type { NodeTargetEventWithPointer } from "@xyflow/svelte";
 
   let selectedId = $state<string | null>(null);
-  let selectedType = $state<'node' | 'edge' | null>(null);
+  let selectedType = $state<"node" | "edge" | null>(null);
 
   let istantiate: boolean = $state(false);
   let istantiateJoin: boolean = $state(false);
@@ -40,31 +40,32 @@
 
   let d = new Diagram();
 
-  const { screenToFlowPosition, getViewport, getIntersectingNodes } = useSvelteFlow();
-  
+  const { screenToFlowPosition, getViewport, getIntersectingNodes } =
+    useSvelteFlow();
+
   function getCenterCoordinates() {
-    const wrapper = document.querySelector('.flow-wrapper');
+    const wrapper = document.querySelector(".flow-wrapper");
     if (!wrapper) return { x: 100, y: 100 };
 
     const rect = wrapper.getBoundingClientRect();
-    
+
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
     const rawPos = screenToFlowPosition({ x: centerX, y: centerY });
     return {
       x: rawPos.x - 50,
-      y: rawPos.y - 30
+      y: rawPos.y - 30,
     };
   }
 
   function deleteSelectedElement() {
     if (!selectedId || !selectedType) return;
 
-    if (selectedType === 'node') {
+    if (selectedType === "node") {
       d.deleteNode(selectedId);
-    } else if (selectedType === 'edge') {
-      d.deleteEdge(selectedId); 
+    } else if (selectedType === "edge") {
+      d.deleteEdge(selectedId);
     }
 
     selectedId = null;
@@ -77,19 +78,19 @@
 
   function handleNodeClick({ event, node }: any) {
     selectedId = node.id;
-    selectedType = 'node';
+    selectedType = "node";
   }
 
   function handleEdgeClick({ event, edge }: any) {
     selectedId = edge.id;
-    selectedType = 'edge';
+    selectedType = "edge";
   }
 
   function handleNodeDoubleClick({ event, node }: any) {
     selectedId = node.id;
-    selectedType = 'node';
+    selectedType = "node";
     const nodeModel = ENode.fromId(node.id);
-    
+
     if (nodeModel && nodeModel.getType() === "Module") {
       editTargetId = node.id;
       istantiate = true;
@@ -102,12 +103,20 @@
     }
   }
 
-  function handleNodeDragStop({ event, targetNode }: { event: MouseEvent | TouchEvent, targetNode: any }){
-    if (!targetNode || !targetNode.id) { 
+  function handleNodeDragStop({
+    event,
+    targetNode,
+  }: {
+    event: MouseEvent | TouchEvent;
+    targetNode: any;
+  }) {
+    if (!targetNode || !targetNode.id) {
       return;
     }
 
-    const intersections = getIntersectingNodes(targetNode).filter((n) => n.type === 'SubGraph');
+    const intersections = getIntersectingNodes(targetNode).filter(
+      (n) => n.type === "SubGraph",
+    );
     const targetGroup = intersections[0];
 
     const nodeIndex = d.nodes.findIndex((n: any) => n.id === targetNode.id);
@@ -116,26 +125,28 @@
     if (targetGroup && targetGroup.id !== targetNode.id) {
       if (d.nodes[nodeIndex].parentId !== targetGroup.id) {
         d.nodes[nodeIndex].parentId = targetGroup.id;
-        
+
         d.nodes[nodeIndex].position = {
           x: targetNode.position.x - targetGroup.position.x,
-          y: targetNode.position.y - targetGroup.position.y
+          y: targetNode.position.y - targetGroup.position.y,
         };
         d.nodes = [...d.nodes];
       }
     } else if (!targetGroup && d.nodes[nodeIndex].parentId) {
-      const oldParent = d.nodes.find((n: any) => n.id === d.nodes[nodeIndex].parentId);
-      
+      const oldParent = d.nodes.find(
+        (n: any) => n.id === d.nodes[nodeIndex].parentId,
+      );
+
       d.nodes[nodeIndex].parentId = undefined;
       d.nodes[nodeIndex].extent = undefined;
 
       if (oldParent) {
         d.nodes[nodeIndex].position = {
           x: targetNode.position.x + oldParent.position.x,
-          y: targetNode.position.y + oldParent.position.y
+          y: targetNode.position.y + oldParent.position.y,
         };
       }
-      
+
       d.nodes = [...d.nodes];
     }
   }
@@ -148,28 +159,28 @@
   function openCreateModal(e: Event) {
     e.stopPropagation();
     editTargetId = null;
-    instantiateImport = true;
+    istantiate = true;
   }
 
   function openEditModal() {
-  if (selectedId && selectedType === 'node') {
-    const nodeModel = ENode.fromId(selectedId);
-    
-    if (nodeModel && nodeModel.getType() === "Module") {
-      editTargetId = selectedId; 
-      istantiate = true;
-    } else if (nodeModel && nodeModel.getType() === "Join") {
-      editTargetId = selectedId;
-      istantiateJoin = true;
-    } else if (nodeModel && nodeModel.getType() === "SubGraph") {
-      const currentName = (nodeModel as any).name;
-      const newName = prompt("Modifica nome Sottoschema:", currentName);
-      if (newName && newName.trim() !== "") {
-        d.updateSubGraph(selectedId, newName);
+    if (selectedId && selectedType === "node") {
+      const nodeModel = ENode.fromId(selectedId);
+
+      if (nodeModel && nodeModel.getType() === "Module") {
+        editTargetId = selectedId;
+        istantiate = true;
+      } else if (nodeModel && nodeModel.getType() === "Join") {
+        editTargetId = selectedId;
+        istantiateJoin = true;
+      } else if (nodeModel && nodeModel.getType() === "SubGraph") {
+        const currentName = (nodeModel as any).name;
+        const newName = prompt("Modifica nome Sottoschema:", currentName);
+        if (newName && newName.trim() !== "") {
+          d.updateSubGraph(selectedId, newName);
+        }
       }
     }
   }
-}
 
   function closeModal() {
     istantiate = false;
@@ -185,7 +196,7 @@
         data.values,
         data.color,
         data.width,
-        data.height
+        data.height,
       );
     } else {
       const coords = getCenterCoordinates();
@@ -197,7 +208,7 @@
         data.width,
         data.height,
         coords.x,
-        coords.y
+        coords.y,
       );
     }
     closeModal();
@@ -205,7 +216,7 @@
 
   function openJoinModal(e: Event) {
     e.stopPropagation();
-    editTargetId = null; 
+    editTargetId = null;
     istantiateJoin = true;
   }
 
@@ -230,11 +241,11 @@
       const coords = getCenterCoordinates();
       return d.addSubGraph(name, coords.x, coords.y);
     }
-    return null
+    return null;
   }
 
   function openImportModal(e: Event) {
-    e.stopPropagation(); 
+    e.stopPropagation();
     instantiateImport = true;
   }
 
@@ -248,7 +259,7 @@
     } else {
       loadFromFile(d);
     }
-    
+
     closeImportModal();
   }
 
@@ -264,11 +275,11 @@
 
     <button
       onclick={openEditModal}
-      disabled={selectedType !== 'node'}
-      class:active={selectedType === 'node'}>✏️ Modifica</button
+      disabled={selectedType !== "node"}
+      class:active={selectedType === "node"}>✏️ Modifica</button
     >
 
-    <button onclick={openJoinModal}>🔗 Inserisci Join</button> 
+    <button onclick={openJoinModal}>🔗 Inserisci Join</button>
 
     <button
       onclick={deleteSelectedElement}
@@ -293,7 +304,7 @@
       onedgeclick={handleEdgeClick}
       onnodedoubleclick={handleNodeDoubleClick}
       onpaneclick={handlePaneClick}
-      onconnect= {onconnect}
+      {onconnect}
       onnodedragstop={handleNodeDragStop}
     >
       <Controls />
@@ -323,25 +334,33 @@
   <div class="modal-overlay" role="dialog">
     <div class="modal-container" style="max-width: 400px; text-align: center;">
       <div class="modal-body">
-        <h3 style="margin-bottom: 20px;">In che formato vuoi importare il diagramma?</h3>
+        <h3 style="margin-bottom: 20px;">
+          In che formato vuoi importare il diagramma?
+        </h3>
         <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button 
-              class="join-option-btn" 
-              onclick={() =>handleImportFromJson("subgraph")}
-              style="padding: 10px; font-size: 16px; cursor: pointer;"
-            >
-              {"Sottografo"}
-            </button>
-            <button 
-              class="join-option-btn" 
-              onclick={() =>handleImportFromJson("diagram")}
-              style="padding: 10px; font-size: 16px; cursor: pointer;"
-            >
-              {"Diagramma"}
-            </button>
+          <button
+            class="join-option-btn"
+            onclick={() => handleImportFromJson("subgraph")}
+            style="padding: 10px; font-size: 16px; cursor: pointer;"
+          >
+            {"Sottografo"}
+          </button>
+          <button
+            class="join-option-btn"
+            onclick={() => handleImportFromJson("diagram")}
+            style="padding: 10px; font-size: 16px; cursor: pointer;"
+          >
+            {"Diagramma"}
+          </button>
         </div>
       </div>
-      <button class="btn-close" style="margin-top: 20px;" onclick={closeJoinModal}> Annulla </button>
+      <button
+        class="btn-close"
+        style="margin-top: 20px;"
+        onclick={closeImportModal}
+      >
+        Annulla
+      </button>
     </div>
   </div>
 {/if}
@@ -353,21 +372,27 @@
         <h3 style="margin-bottom: 20px;">Seleziona il tipo di Join</h3>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           {#each d.joins as joinStereotype}
-            <button 
-              class="join-option-btn" 
+            <button
+              class="join-option-btn"
               onclick={() => handleSelectJoin(joinStereotype)}
               style="padding: 10px; font-size: 16px; cursor: pointer;"
             >
               {joinStereotype.name}
             </button>
           {/each}
-          
+
           {#if d.joins.length === 0}
             <p>Nessun Join trovato nella cartella.</p>
           {/if}
         </div>
       </div>
-      <button class="btn-close" style="margin-top: 20px;" onclick={closeJoinModal}> Annulla </button>
+      <button
+        class="btn-close"
+        style="margin-top: 20px;"
+        onclick={closeJoinModal}
+      >
+        Annulla
+      </button>
     </div>
   </div>
 {/if}
@@ -375,3 +400,4 @@
 <style>
   @import "../lib/styles/page.css";
 </style>
+

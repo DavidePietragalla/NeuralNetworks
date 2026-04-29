@@ -6,6 +6,7 @@ import { Stereotype } from "./model/stereotype";
 import { JoinStereotype } from "./model/joinStereotype";
 import { Join } from "./model/join";
 import { SubGraph } from "./model/subgraph";
+import { Target } from "@lucide/svelte";
 
 export class Diagram {
   public stereotypes: Array<Stereotype> = [];
@@ -214,5 +215,18 @@ export class Diagram {
         this.nodes = [...this.nodes];
       }
     }
+  }
+
+  public addENodeWithEdges(module: ENode, vnode: VNode, edges: any[], subname: string) {
+    console.log("addENodeWithEdges");
+    ENode.allNodes.set(module.id, module); // inserito nel modello
+    this.nodes = [...this.nodes, vnode]; // inserito nella view
+    // Aggiungere edges
+    for (const edge of edges)
+      this.addConnection({
+        source: module.id,
+        target: `${subname}_${edge.target}`,
+        target_handle: edge.target_handle // TODO: aggiungere per i join
+      });
   }
 }

@@ -5,35 +5,42 @@
 
   let { id, data, selected }: NodeProps = $props();
 
-  let l: Module = $derived(ENode.fromId(data.enode as string)) as Module;
-
+  let l: ENode = $derived(ENode.fromId(data.enode as string)) as Module;
   let nodeColor = $derived(data.color || "#4779c4");
   let nodeWidth = $derived(data.width || "100px");
   let nodeHeight = $derived(data.height || "60px");
 
   let nodeName = $derived((data._tick, l?.name));
+  // let isSubgraph = $derived((data._tick, l.getType() === "SubGraph"));
+
   let isInput = $derived(
-    (data._tick, l?.stereotype.category.toLowerCase() === "input"),
+    (data._tick,
+    l.getType() === "Module" &&
+      l?.stereotype.category.toLowerCase() === "input"),
   );
 
   let isLoss = $derived(
-    (data._tick, l?.stereotype.category.toLowerCase().includes("loss")),
+    (data._tick,
+    l.getType() === "Module" &&
+      l?.stereotype.category.toLowerCase().includes("loss")),
   );
 
   let inFeatures = $derived(
     (data._tick,
-    l?.params.find(
-      (p) =>
-        p.name === "in_features" ||
-        p.name === "in_channels" ||
-        p.name === "num_features",
-    )?.value),
+    l.getType() === "Module" &&
+      l?.params.find(
+        (p) =>
+          p.name === "in_features" ||
+          p.name === "in_channels" ||
+          p.name === "num_features",
+      )?.value),
   );
   let outFeatures = $derived(
     (data._tick,
-    l?.params.find(
-      (p) => p.name === "out_features" || p.name === "out_channels",
-    )?.value),
+    l.getType() === "Module" &&
+      l?.params.find(
+        (p) => p.name === "out_features" || p.name === "out_channels",
+      )?.value),
   );
 
   function handleInternalClick() {

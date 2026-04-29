@@ -49,6 +49,10 @@ export class Module extends ENode {
     }
   }
 
+  getName(): string {
+    return this.name;
+  }
+
   getType(): string {
     return "Module";
   }
