@@ -174,8 +174,14 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
       parentId: subgraph.parentId
     })).forEach((vnodeRaw: any) => {
       let enodeRaw = parsedData.model[vnodeRaw.id];
-      vnodeRaw.id = `${subgraph.id}_${vnodeRaw.id}`;
-      enodeRaw.id = vnodeRaw.id;
+      let oldId = vnodeRaw.id;
+      let newId = `${subgraph.id}_${vnodeRaw.id}`;
+      vnodeRaw.id = newId;
+      enodeRaw.id = newId;
+      // Update data.enode to match the new ID
+      if (vnodeRaw.data && vnodeRaw.data.enode) {
+        vnodeRaw.data.enode = newId;
+      }
       let new_nexts = [];
       for (const key of enodeRaw.next_nodes) {
         new_nexts.push(`${subgraph.id}_${key}`);
@@ -190,6 +196,9 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
     // d.edges = parsedData.view.edges || [];
 
     console.log("filter done")
+
+    // Create a map of subgraph node IDs for fast lookup
+    const subgraphNodeIds = new Set(modifiedVNodes.keys());
 
     // 2. Ripristina i dati del modello logico
     for (const value of modifiedENode) {
@@ -211,9 +220,11 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
         console.log("numberOfInputs");
         Object.setPrototypeOf(rawNode, Join.prototype);
         let joinNode: Join = rawNode;
+        // Filter edges that originate from this subgraph node
         d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), parsedData.view.edges.filter(
           (edge: any) => {
-            return edge.source == joinNode.id.split("_")[1];
+            // Edge source is in the set of subgraph node IDs (with prefix)
+            return edge.source === joinNode.id;
           }
         ), subgraph.id);
       } else {
@@ -223,7 +234,8 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
 
         d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), parsedData.view.edges.filter(
           (edge: any) => {
-            return edge.source == mod.id.split("_")[1];
+            // Edge source is in the set of subgraph node IDs (with prefix)
+            return edge.source === mod.id;
           }
         ), subgraph.id);
       }

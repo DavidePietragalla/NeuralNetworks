@@ -221,12 +221,16 @@ export class Diagram {
     console.log("addENodeWithEdges");
     ENode.allNodes.set(module.id, module); // inserito nel modello
     this.nodes = [...this.nodes, vnode]; // inserito nella view
-    // Aggiungere edges
-    for (const edge of edges)
+    // Aggiungere edges - edges are already relative to the module.id (without prefix)
+    for (const edge of edges) {
+      // The edge.source and edge.target are relative IDs (e.g., "ENode_1")
+      // We need to find the actual edges from the raw edges data
+      console.log(`Adding edge: source=${module.id}, target=${subname}_${edge.target}`);
       this.addConnection({
         source: module.id,
         target: `${subname}_${edge.target}`,
         target_handle: edge.target_handle // TODO: aggiungere per i join
       });
+    }
   }
 }
