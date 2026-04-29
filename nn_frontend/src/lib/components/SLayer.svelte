@@ -4,8 +4,7 @@
   import {
     Handle,
     Position,
-    NodeResizeControl,
-    ResizeControlVariant,
+    NodeResizer,
     type NodeProps
   } from "@xyflow/svelte";
 
@@ -103,10 +102,17 @@
         <Handle type="source" position={Position.Bottom} />
       {/if}
 
-      <NodeResizeControl
-        position="bottom-right"
-        variant={ResizeControlVariant.Handle}
+      <NodeResizer
         color="#ff0072"
+        onResizeEnd={(event: any) => {
+          console.log('Node resized:', event);
+          const { width, height } = event;
+          // Update node dimensions in data
+          data.width = `${width}px`;
+          data.height = `${height}px`;
+          // Trigger reactivity
+          data._tick = Date.now();
+        }}
       />
     </div>
   {/if}
