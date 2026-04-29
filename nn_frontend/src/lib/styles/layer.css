@@ -8,9 +8,9 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   /* Usiamo var() per la grandezza */
   text-align: center;
-  min-width: var(--node-min-width, 100px);
-  min-height: var(--node-min-height, 60px); /* <-- Aggiunta l'altezza */
-  
+  width: var(--node-width, 100px);
+  height: var(--node-height, 60px);
+
   /* Centriamo il testo verticalmente e orizzontalmente se l'altezza cambia */
   display: flex;
   flex-direction: column;

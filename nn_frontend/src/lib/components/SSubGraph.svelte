@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Handle, Position, type NodeProps } from "@xyflow/svelte";
+  import {
+    Handle,
+    Position,
+    NodeResizeControl,
+    ResizeControlVariant,
+    type NodeProps
+  } from "@xyflow/svelte";
   import { ENode } from "$lib/model/node";
   import { SubGraph } from "$lib/model/subgraph";
 
@@ -23,6 +29,7 @@
 <div
   class="subgraph-wrapper"
   class:selected
+  style="width: {data.width || '400px'}; height: {data.height || '300px'};"
   onclick={handleInternalClick}
   role="button"
   tabindex="0"
@@ -33,13 +40,17 @@
   </div>
 
   <div class="subgraph-body"></div>
+
+  <NodeResizeControl
+    position="bottom-right"
+    variant={ResizeControlVariant.Handle}
+    color="#ff0072"
+  />
 </div>
 
 <style>
   .subgraph-wrapper {
     position: relative;
-    width: 100%;
-    height: 100%;
     border-radius: 8px;
     display: flex;
     flex-direction: column;

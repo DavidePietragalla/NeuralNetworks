@@ -1,7 +1,13 @@
 <script lang="ts">
   import type { Module } from "$lib/model/module";
   import { ENode } from "$lib/model/node";
-  import { Handle, Position, type NodeProps } from "@xyflow/svelte";
+  import {
+    Handle,
+    Position,
+    NodeResizeControl,
+    ResizeControlVariant,
+    type NodeProps
+  } from "@xyflow/svelte";
 
   let { id, data, selected }: NodeProps = $props();
 
@@ -79,7 +85,7 @@
   {:else}
     <div
       class="custom-node"
-      style="--node-bg-color: {nodeColor}; --node-min-width: {nodeWidth}; --node-min-height: {nodeHeight};"
+      style="--node-bg-color: {nodeColor}; --node-width: {nodeWidth}; --node-height: {nodeHeight};"
     >
       <Handle type="target" position={Position.Top} />
 
@@ -96,6 +102,12 @@
       {#if !isLoss}
         <Handle type="source" position={Position.Bottom} />
       {/if}
+
+      <NodeResizeControl
+        position="bottom-right"
+        variant={ResizeControlVariant.Handle}
+        color="#ff0072"
+      />
     </div>
   {/if}
 </div>
