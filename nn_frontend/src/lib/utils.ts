@@ -355,6 +355,9 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
         subgraphVNode.data.height = `${subgraphHeight}px`;
         // Update style to match new dimensions
         subgraphVNode.style = `width: ${subgraphWidth}px; height: ${subgraphHeight}px; background-color: rgba(71, 121, 196, 0.1); border: 2px dashed #4779c4; z-index: -1;`;
+        // Trigger Svelte reactivity
+        subgraphVNode.data._tick = Date.now();
+        d.nodes = [...d.nodes];
       }
     }
     
