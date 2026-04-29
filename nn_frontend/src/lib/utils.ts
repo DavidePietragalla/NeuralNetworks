@@ -255,11 +255,14 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
           return edge.source === nodeOriginalId;
         });
         console.log(`Join ${joinNode.id} matching edges:`, matchingEdges);
-        // Prefix edge targets to the subgraph's IDs
-        const prefixedEdges = matchingEdges.map((edge: any) => ({
-          ...edge,
-          target: `${subgraph.id}_${edge.target}`
-        }));
+        // Get prefixed target IDs from idMapping
+        const prefixedEdges = matchingEdges.map((edge: any) => {
+          const prefixedTarget = idMapping.get(edge.target);
+          return {
+            ...edge,
+            target: prefixedTarget || `${subgraph.id}_${edge.target}`
+          };
+        });
         d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), prefixedEdges, subgraph.id);
       } else {
         // caso Module
@@ -275,11 +278,14 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
           return edge.source === nodeOriginalId;
         });
         console.log(`Module ${mod.id} matching edges:`, matchingEdges);
-        // Prefix edge targets to the subgraph's IDs
-        const prefixedEdges = matchingEdges.map((edge: any) => ({
-          ...edge,
-          target: `${subgraph.id}_${edge.target}`
-        }));
+        // Get prefixed target IDs from idMapping
+        const prefixedEdges = matchingEdges.map((edge: any) => {
+          const prefixedTarget = idMapping.get(edge.target);
+          return {
+            ...edge,
+            target: prefixedTarget || `${subgraph.id}_${edge.target}`
+          };
+        });
         d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), prefixedEdges, subgraph.id);
       }
       // TODO: controlla che l'Id non esista
