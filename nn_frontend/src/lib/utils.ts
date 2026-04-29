@@ -171,6 +171,10 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
 
     console.log("filteredNodes: ", filteredNodes);
 
+    // Calculate relative positions for nodes inside the subgraph
+    const subgraphX = subgraph.position?.x || 0;
+    const subgraphY = subgraph.position?.y || 0;
+
     filteredNodes.map((node: any) => ({
       ...node,
       parentId: subgraph.id  // Bind nodes to subgraph (not subgraph.parentId)
@@ -180,6 +184,15 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
       let newId = `${subgraph.id}_${vnodeRaw.id}`;
       vnodeRaw.id = newId;
       enodeRaw.id = newId;
+      
+      // Convert absolute position to relative position within subgraph
+      if (vnodeRaw.position) {
+        vnodeRaw.position = {
+          x: vnodeRaw.position.x - subgraphX,
+          y: vnodeRaw.position.y - subgraphY
+        };
+      }
+      
       // Update data.enode to match the new ID
       if (vnodeRaw.data && vnodeRaw.data.enode) {
         vnodeRaw.data.enode = newId;
@@ -242,7 +255,12 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
           return edge.source === nodeOriginalId;
         });
         console.log(`Join ${joinNode.id} matching edges:`, matchingEdges);
-        d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), matchingEdges, subgraph.id);
+        // Prefix edge targets to the subgraph's IDs
+        const prefixedEdges = matchingEdges.map((edge: any) => ({
+          ...edge,
+          target: `${subgraph.id}_${edge.target}`
+        }));
+        d.addENodeWithEdges(joinNode, modifiedVNodes.get(joinNode.id), prefixedEdges, subgraph.id);
       } else {
         // caso Module
         Object.setPrototypeOf(rawNode, Module.prototype);
@@ -257,7 +275,12 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
           return edge.source === nodeOriginalId;
         });
         console.log(`Module ${mod.id} matching edges:`, matchingEdges);
-        d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), matchingEdges, subgraph.id);
+        // Prefix edge targets to the subgraph's IDs
+        const prefixedEdges = matchingEdges.map((edge: any) => ({
+          ...edge,
+          target: `${subgraph.id}_${edge.target}`
+        }));
+        d.addENodeWithEdges(mod, modifiedVNodes.get(mod.id), prefixedEdges, subgraph.id);
       }
       // TODO: controlla che l'Id non esista
     }
