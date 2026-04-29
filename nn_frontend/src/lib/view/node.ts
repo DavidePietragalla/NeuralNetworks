@@ -5,7 +5,9 @@ export class VNode {
   public position: { x: number; y: number };
   public data: Record<string, any>;
   public type: string;
-  
+  public width?: string;
+  public height?: string;
+
   public parentId?: string;
   public extent?: 'parent';
   public style?: string;
@@ -41,6 +43,8 @@ export class VNode {
       _tick: Date.now()
     };
     
+    this.width = width || "100px";
+    this.height = height || "60px";
     if (this.type === "SubGraph") {
         this.style = "width: 400px; height: 300px; background-color: rgba(71, 121, 196, 0.1); border: 2px dashed #4779c4; z-index: -1;";
     }
