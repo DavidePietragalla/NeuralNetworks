@@ -3,6 +3,7 @@
     Handle,
     Position,
     NodeResizer,
+    useInternalNode,
     type NodeProps
   } from "@xyflow/svelte";
   import { ENode } from "$lib/model/node";
@@ -11,9 +12,26 @@
   let { id, data, selected, width, height }: NodeProps = $props();
 
   let subGraph = $derived(ENode.fromId(data.enode as string) as SubGraph);
-  // Use node's width/height if provided, otherwise fall back to data
-  let subGraphWidth = $derived((typeof width === 'number' && `${width}px`) || data.width || "400px");
-  let subGraphHeight = $derived((typeof height === 'number' && `${height}px`) || data.height || "300px");
+  
+  // Get the actual node from the store to access its width/height
+  let internalNode = $derived(useInternalNode(id));
+  
+  let subGraphWidth = $derived.by(() => {
+    const nodeWidth = internalNode.current?.width;
+    if (nodeWidth !== undefined) {
+      return `${nodeWidth}px`;
+    }
+    return data.width || "400px";
+  });
+  
+  let subGraphHeight = $derived.by(() => {
+    const nodeHeight = internalNode.current?.height;
+    if (nodeHeight !== undefined) {
+      return `${nodeHeight}px`;
+    }
+    return data.height || "300px";
+  });
+  
   let nodeName = $derived((data._tick, subGraph?.name || "SubGraph"));
 
   function handleInternalClick() {
@@ -45,13 +63,6 @@
 
   <NodeResizer
     color="#ff0072"
-    onResize={(event: any) => {
-      // Update data dimensions during resize (not just at end)
-      // SvelteFlow updates node.width/height directly in store
-      // We also update data to keep CSS synced
-      data.width = `${event.width}px`;
-      data.height = `${event.height}px`;
-    }}
     onResizeEnd={(event: any) => {
       // Trigger reactivity after resize ends
       data._tick = Date.now();
