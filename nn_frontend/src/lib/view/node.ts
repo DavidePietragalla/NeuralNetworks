@@ -32,7 +32,7 @@ export class VNode {
     this.parentId = parentId;
 
     if (parentId) {
-      this.extent = 'parent';
+      //this.extent = 'parent';
     }
 
     this.data = {
