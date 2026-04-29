@@ -13,8 +13,9 @@
   let moduleNode = $derived(ENode.fromId(data.enode as string) as Module | undefined);
   let nodeColor = $derived(data.color || "#4779c4");
   // Use node's width/height if provided, otherwise fall back to data
-  let nodeWidth = $derived((width && `${width}px`) || data.width || "100px");
-  let nodeHeight = $derived((height && `${height}px`) || data.height || "60px");
+  // NodeResizer updates node.width/height (numbers), convert to px strings
+  let nodeWidth = $derived((typeof width === 'number' && `${width}px`) || data.width || "100px");
+  let nodeHeight = $derived((typeof height === 'number' && `${height}px`) || data.height || "60px");
 
   let nodeName = $derived((data._tick, moduleNode?.name));
   // let isSubgraph = $derived((data._tick, l.getType() === "SubGraph"));
@@ -107,6 +108,8 @@
         color="#ff0072"
         onResize={(event: any) => {
           // Update data dimensions during resize (not just at end)
+          // SvelteFlow updates node.width/height directly in store
+          // We also update data to keep CSS synced
           data.width = `${event.width}px`;
           data.height = `${event.height}px`;
         }}

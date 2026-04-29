@@ -11,6 +11,9 @@
   let { id, data, selected, width, height }: NodeProps = $props();
 
   let subGraph = $derived(ENode.fromId(data.enode as string) as SubGraph);
+  // Use node's width/height if provided, otherwise fall back to data
+  let subGraphWidth = $derived((typeof width === 'number' && `${width}px`) || data.width || "400px");
+  let subGraphHeight = $derived((typeof height === 'number' && `${height}px`) || data.height || "300px");
   let nodeName = $derived((data._tick, subGraph?.name || "SubGraph"));
 
   function handleInternalClick() {
@@ -28,7 +31,7 @@
 <div
   class="subgraph-wrapper"
   class:selected
-  style="width: {data.width || '400px'}; height: {data.height || '300px'};"
+  style="width: {subGraphWidth}; height: {subGraphHeight};"
   onclick={handleInternalClick}
   role="button"
   tabindex="0"
@@ -43,10 +46,14 @@
   <NodeResizer
     color="#ff0072"
     onResize={(event: any) => {
+      // Update data dimensions during resize (not just at end)
+      // SvelteFlow updates node.width/height directly in store
+      // We also update data to keep CSS synced
       data.width = `${event.width}px`;
       data.height = `${event.height}px`;
     }}
     onResizeEnd={(event: any) => {
+      // Trigger reactivity after resize ends
       data._tick = Date.now();
     }}
   />
