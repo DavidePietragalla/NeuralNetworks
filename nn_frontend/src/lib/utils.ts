@@ -170,10 +170,39 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
     });
 
     console.log("filteredNodes: ", filteredNodes);
+    // First pass: collect all child node positions to determine subgraph origin
+    let childMinX = Infinity;
+    let childMinY = Infinity;
 
-    // Calculate relative positions for nodes inside the subgraph
-    const subgraphX = subgraph.position?.x || 0;
-    const subgraphY = subgraph.position?.y || 0;
+    filteredNodes.forEach((node: any) => {
+      if (node.position) {
+        childMinX = Math.min(childMinX, node.position.x);
+        childMinY = Math.min(childMinY, node.position.y);
+      }
+    });
+
+    // Calculate proper subgraph position (with padding)
+    const padding = 50;
+    let newSubgraphX = childMinX - padding;
+    let newSubgraphY = childMinY - padding;
+
+    // Update subgraph position to ensure all children fit nicely
+    console.log("Child nodes range:", { minX: childMinX, minY: childMinY });
+    console.log("New subgraph position:", { x: newSubgraphX, y: newSubgraphY });
+
+    // Update the subgraph VNode's position to trigger reactivity
+    const subgraphVNode = d.nodes.find(n => n.id === subgraph.id);
+    if (subgraphVNode) {
+      subgraphVNode.position = { x: newSubgraphX, y: newSubgraphY };
+      subgraphVNode.data._tick = Date.now();
+      d.nodes = [...d.nodes];  // Force Svelte reactivity
+    }
+    // Also update the subgraph model node position
+    subgraph.position = { x: newSubgraphX, y: newSubgraphY };
+
+    // Now convert child node positions to be relative to the subgraph
+    const subgraphX = newSubgraphX;
+    const subgraphY = newSubgraphY;
 
     filteredNodes.map((node: any) => ({
       ...node,
@@ -207,7 +236,6 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
       modifiedVNodes.set(vnodeRaw.id, vnodeRaw);
       modifiedENode.push(enodeRaw);
     });
-
     // Store raw edges for edge matching later
     const rawEdges = parsedData.view.edges || [];
 
