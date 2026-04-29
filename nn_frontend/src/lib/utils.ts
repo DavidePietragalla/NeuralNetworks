@@ -291,6 +291,44 @@ export function loadJsonAsSubGraph(d: Diagram, jsonString: string, subgraph: VNo
       // TODO: controlla che l'Id non esista
     }
     console.log("Importazione completata con successo!");
+
+    // Adjust subgraph size to fit all child nodes
+    // Calculate bounding box of all child nodes
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    
+    for (const vnode of modifiedVNodes.values()) {
+      if (vnode.position) {
+        const nodeWidth = vnode.data?.width ? parseFloat(vnode.data.width) : 100;
+        const nodeHeight = vnode.data?.height ? parseFloat(vnode.data.height) : 60;
+        minX = Math.min(minX, vnode.position.x);
+        minY = Math.min(minY, vnode.position.y);
+        maxX = Math.max(maxX, vnode.position.x + nodeWidth);
+        maxY = Math.max(maxY, vnode.position.y + nodeHeight);
+      }
+    }
+    
+    console.log("Bounding box of child nodes:", { minX, minY, maxX, maxY });
+    
+    // Update subgraph size if we have valid bounds
+    if (minX !== Infinity && minY !== Infinity) {
+      const padding = 50;
+      const subgraphWidth = (maxX - minX) + padding * 2;
+      const subgraphHeight = (maxY - minY) + padding * 2;
+      
+      console.log("Subgraph new size:", { width: subgraphWidth, height: subgraphHeight });
+      
+      // Update the subgraph node's VNode data with new dimensions
+      const subgraphVNode = d.nodes.find(n => n.id === subgraph.id);
+      if (subgraphVNode) {
+        subgraphVNode.data.width = `${subgraphWidth}px`;
+        subgraphVNode.data.height = `${subgraphHeight}px`;
+        // Update style to match new dimensions
+        subgraphVNode.style = `width: ${subgraphWidth}px; height: ${subgraphHeight}px; background-color: rgba(71, 121, 196, 0.1); border: 2px dashed #4779c4; z-index: -1;`;
+      }
+    }
     
     // Add all edges from the subgraph to the diagram
     // Edges use original IDs, so we need to prefix them for the diagram
