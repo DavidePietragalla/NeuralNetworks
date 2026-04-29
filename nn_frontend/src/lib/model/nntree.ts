@@ -13,7 +13,7 @@ export class NNTreeNode {
   public id: string;
   public parentId: string | null;
   public children: NNTreeNode[];
-  public data: SequentialData | ForkData | JoinData | ModuleData;
+  public data: SequentialData | ForkData | JoinData | ModuleData | EmptyData;
   public inputNodes: string[]; // For tracking which nodes feed into this node
 
   constructor(id: string, parentId: string | null = null) {
@@ -87,6 +87,11 @@ export interface JoinData {
   joinType: "add" | "concat" | "average";
   inputNodes: string[]; // IDs of nodes being joined
   outputChannel?: number; // Track output channel count for validation
+}
+
+// Empty data for initial node state
+export interface EmptyData {
+  type: "empty";
 }
 
 // Single module layer
@@ -248,7 +253,12 @@ export class NNTree {
       const sequentialBlock = this.createSequentialNode(moduleNode, parent);
 
       // Update channel map for validation
-      this.channelMap.set(node.id, this.extractOutputChannels(moduleNode));
+      const outputChannels = this.extractOutputChannels(moduleNode);
+      if (outputChannels !== undefined) {
+        this.channelMap.set(node.id, outputChannels);
+      } else {
+        console.log(`WARNING: Could not extract output channels for node ${node.id}`);
+      }
 
       // Continue processing next nodes
       if (node.next_nodes.length > 0) {

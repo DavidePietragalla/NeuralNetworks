@@ -302,7 +302,6 @@
       fitView
       onnodeclick={handleNodeClick}
       onedgeclick={handleEdgeClick}
-      onnodedoubleclick={handleNodeDoubleClick}
       onpaneclick={handlePaneClick}
       {onconnect}
       onnodedragstop={handleNodeDragStop}

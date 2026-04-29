@@ -65,8 +65,9 @@ export async function loadFromFile(d: Diagram, subgraph: VNode | null = null) {
 async function saveToFile(jsonString: string) {
   try {
     // 2. Prova a usare la File System Access API (Apre il popup di salvataggio nativo)
-    if (window.showSaveFilePicker) {
-      const fileHandle = await window.showSaveFilePicker({
+    // Type assertion to bypass TypeScript's Window type definition limitations
+    if ((window as any).showSaveFilePicker) {
+      const fileHandle = await (window as any).showSaveFilePicker({
         suggestedName: "model_config.json",
         types: [
           {

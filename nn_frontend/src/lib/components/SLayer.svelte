@@ -5,31 +5,31 @@
 
   let { id, data, selected }: NodeProps = $props();
 
-  let l: ENode = $derived(ENode.fromId(data.enode as string)) as Module;
+  let moduleNode = $derived(ENode.fromId(data.enode as string) as Module | undefined);
   let nodeColor = $derived(data.color || "#4779c4");
   let nodeWidth = $derived(data.width || "100px");
   let nodeHeight = $derived(data.height || "60px");
 
-  let nodeName = $derived((data._tick, l?.name));
+  let nodeName = $derived((data._tick, moduleNode?.name));
   // let isSubgraph = $derived((data._tick, l.getType() === "SubGraph"));
 
   let isInput = $derived(
     (data._tick,
-    l.getType() === "Module" &&
-      l?.stereotype.category.toLowerCase() === "input"),
+    moduleNode?.getType() === "Module" &&
+      moduleNode.stereotype.category.toLowerCase() === "input"),
   );
 
   let isLoss = $derived(
     (data._tick,
-    l.getType() === "Module" &&
-      l?.stereotype.category.toLowerCase().includes("loss")),
+    moduleNode?.getType() === "Module" &&
+      moduleNode.stereotype.category.toLowerCase().includes("loss")),
   );
 
   let inFeatures = $derived(
     (data._tick,
-    l.getType() === "Module" &&
-      l?.params.find(
-        (p) =>
+    moduleNode?.getType() === "Module" &&
+      moduleNode.params.find(
+        (p: { name: string }) =>
           p.name === "in_features" ||
           p.name === "in_channels" ||
           p.name === "num_features",
@@ -37,9 +37,9 @@
   );
   let outFeatures = $derived(
     (data._tick,
-    l.getType() === "Module" &&
-      l?.params.find(
-        (p) => p.name === "out_features" || p.name === "out_channels",
+    moduleNode?.getType() === "Module" &&
+      moduleNode.params.find(
+        (p: { name: string }) => p.name === "out_features" || p.name === "out_channels",
       )?.value),
   );
 
