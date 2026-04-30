@@ -141,9 +141,22 @@
     if (targetGroup && targetGroup.id !== targetNode.id) {
       if (targetVNode.parentId !== targetGroup.id) {
         console.log("FUNZIONE CHIAMATA");
+        // Find the parent (SubGraph) node index
+        const parentIndex = d.nodes.findIndex((n: any) => n.id === targetGroup.id);
+        const childIndex = nodeIndex;
+
+        // Reorder: parent must come before child in the nodes array
+        let newNodes = [...d.nodes];
+        if (parentIndex < childIndex) {
+          // Remove child from current position
+          const childNode = newNodes.splice(childIndex, 1)[0];
+          // Insert child right after parent
+          newNodes.splice(parentIndex + 1, 0, childNode);
+          d.nodes = newNodes;
+        }
+
         // Update VNode
         targetVNode.parentId = targetGroup.id;
-        // targetVNode.extent = "parent";
         // Update position to be relative to parent
         targetVNode.position = {
           x: targetNode.position.x - targetGroup.position.x,
@@ -152,17 +165,26 @@
         // Sync with SvelteFlow
         updateNode(targetNode.id, {
           parentId: targetGroup.id,
-          // extent: "parent",
           position: {
             x: targetNode.position.x - targetGroup.position.x,
             y: targetNode.position.y - targetGroup.position.y,
           },
         });
-        d.nodes = [...d.nodes];
       }
     } else if (!targetGroup && targetVNode.parentId) {
       console.log("FUNZIONE NON CHIAMATA");
       const oldParent = d.nodes.find((n: any) => n.id === targetVNode.parentId);
+      if (oldParent) {
+        // Reorder: remove child from after parent, put at end
+        const parentIndex = d.nodes.findIndex((n: any) => n.id === oldParent.id);
+        const childIndex = d.nodes.findIndex((n: any) => n.id === targetNode.id);
+        if (childIndex > parentIndex) {
+          let newNodes = [...d.nodes];
+          const childNode = newNodes.splice(childIndex, 1)[0];
+          newNodes.push(childNode);
+          d.nodes = newNodes;
+        }
+      }
       // Update VNode
       targetVNode.parentId = undefined;
       targetVNode.extent = undefined;
@@ -179,7 +201,6 @@
         extent: undefined,
         position: targetVNode.position,
       });
-      d.nodes = [...d.nodes];
     }
   }
 
