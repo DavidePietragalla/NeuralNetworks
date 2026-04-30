@@ -176,28 +176,24 @@
         // Update VNode
         targetVNode.parentId = targetGroup.id;
         // Update position to be relative to parent
-        targetVNode.position = {
-          x: targetNode.position.x - targetGroup.position.x,
-          y: targetNode.position.y - targetGroup.position.y,
-        };
+        const relativeX = targetNode.position.x - targetGroup.position.x;
+        const relativeY = targetNode.position.y - targetGroup.position.y;
+        console.log("targetNode.position:", targetNode.position);
+        console.log("targetGroup.position:", targetGroup.position);
+        console.log("Calculated relative position:", { x: relativeX, y: relativeY });
+        targetVNode.position = { x: relativeX, y: relativeY };
         // Sync with SvelteFlow
         console.log("Calling updateNode with:", {
           parentId: targetGroup.id,
-          position: {
-            x: targetNode.position.x - targetGroup.position.x,
-            y: targetNode.position.y - targetGroup.position.y,
-          },
+          position: { x: relativeX, y: relativeY },
         });
         updateNode(targetNode.id, {
           parentId: targetGroup.id,
-          position: {
-            x: targetNode.position.x - targetGroup.position.x,
-            y: targetNode.position.y - targetGroup.position.y,
-          },
+          position: { x: relativeX, y: relativeY },
         });
         console.log("After updateNode, d.nodes length:", d.nodes.length);
         d.nodes.forEach((n: any, idx: number) => {
-          console.log(`  [${idx}] ${n.id} parentId: ${n.parentId}`);
+          console.log(`  [${idx}] ${n.id} parentId: ${n.parentId} position: ${JSON.stringify(n.position)}`);
         });
       }
     } else if (!targetGroup && targetVNode.parentId) {
