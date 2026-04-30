@@ -11,6 +11,8 @@ export class VNode {
   public parentId?: string;
   public extent?: 'parent';
   public style?: string;
+  public expandParent: boolean = true
+
 
   constructor(
     node: ENode,

@@ -138,7 +138,7 @@
       if (targetVNode.parentId !== targetGroup.id) {
         console.log("FUNZIONE CHIAMATA");
         targetVNode.parentId = targetGroup.id;
-        targetVNode.extent = "parent";
+        // targetVNode.extent = "parent";
         // d.nodes[nodeIndex].position = {
         //   x: targetNode.position.x - targetGroup.position.x,
         //   y: targetNode.position.y - targetGroup.position.y,
@@ -152,7 +152,7 @@
       // );
       //
       d.nodes[nodeIndex].parentId = undefined;
-      d.nodes[nodeIndex].extent = undefined;
+      // d.nodes[nodeIndex].extent = undefined;
 
       // if (oldParent) {
       //   d.nodes[nodeIndex].position = {
