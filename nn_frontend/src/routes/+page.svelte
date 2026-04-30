@@ -40,8 +40,12 @@
 
   let d = new Diagram();
 
-  const { screenToFlowPosition, getViewport, getIntersectingNodes, updateNode } =
-    useSvelteFlow();
+  const {
+    screenToFlowPosition,
+    getViewport,
+    getIntersectingNodes,
+    updateNode,
+  } = useSvelteFlow();
 
   function getCenterCoordinates() {
     const wrapper = document.querySelector(".flow-wrapper");
@@ -139,7 +143,7 @@
         console.log("FUNZIONE CHIAMATA");
         // Update VNode
         targetVNode.parentId = targetGroup.id;
-        targetVNode.extent = "parent";
+        // targetVNode.extent = "parent";
         // Update position to be relative to parent
         targetVNode.position = {
           x: targetNode.position.x - targetGroup.position.x,
@@ -148,7 +152,7 @@
         // Sync with SvelteFlow
         updateNode(targetNode.id, {
           parentId: targetGroup.id,
-          extent: "parent",
+          // extent: "parent",
           position: {
             x: targetNode.position.x - targetGroup.position.x,
             y: targetNode.position.y - targetGroup.position.y,
@@ -158,9 +162,7 @@
       }
     } else if (!targetGroup && targetVNode.parentId) {
       console.log("FUNZIONE NON CHIAMATA");
-      const oldParent = d.nodes.find(
-        (n: any) => n.id === targetVNode.parentId,
-      );
+      const oldParent = d.nodes.find((n: any) => n.id === targetVNode.parentId);
       // Update VNode
       targetVNode.parentId = undefined;
       targetVNode.extent = undefined;
