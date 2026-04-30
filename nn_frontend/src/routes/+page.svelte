@@ -40,7 +40,7 @@
 
   let d = new Diagram();
 
-  const { screenToFlowPosition, getViewport, getIntersectingNodes } =
+  const { screenToFlowPosition, getViewport, getIntersectingNodes, updateNode } =
     useSvelteFlow();
 
   function getCenterCoordinates() {
@@ -137,30 +137,46 @@
     if (targetGroup && targetGroup.id !== targetNode.id) {
       if (targetVNode.parentId !== targetGroup.id) {
         console.log("FUNZIONE CHIAMATA");
+        // Update VNode
         targetVNode.parentId = targetGroup.id;
-        // targetVNode.extent = "parent";
-        // d.nodes[nodeIndex].position = {
-        //   x: targetNode.position.x - targetGroup.position.x,
-        //   y: targetNode.position.y - targetGroup.position.y,
-        // };
+        targetVNode.extent = "parent";
+        // Update position to be relative to parent
+        targetVNode.position = {
+          x: targetNode.position.x - targetGroup.position.x,
+          y: targetNode.position.y - targetGroup.position.y,
+        };
+        // Sync with SvelteFlow
+        updateNode(targetNode.id, {
+          parentId: targetGroup.id,
+          extent: "parent",
+          position: {
+            x: targetNode.position.x - targetGroup.position.x,
+            y: targetNode.position.y - targetGroup.position.y,
+          },
+        });
         d.nodes = [...d.nodes];
       }
     } else if (!targetGroup && targetVNode.parentId) {
       console.log("FUNZIONE NON CHIAMATA");
-      // const oldParent = d.nodes.find(
-      //   (n: any) => n.id === d.nodes[nodeIndex].parentId,
-      // );
-      //
-      d.nodes[nodeIndex].parentId = undefined;
-      // d.nodes[nodeIndex].extent = undefined;
-
-      // if (oldParent) {
-      //   d.nodes[nodeIndex].position = {
-      //     x: targetNode.position.x + oldParent.position.x,
-      //     y: targetNode.position.y + oldParent.position.y,
-      //   };
-      // }
-      //
+      const oldParent = d.nodes.find(
+        (n: any) => n.id === targetVNode.parentId,
+      );
+      // Update VNode
+      targetVNode.parentId = undefined;
+      targetVNode.extent = undefined;
+      // Update position to be absolute (relative to canvas)
+      if (oldParent) {
+        targetVNode.position = {
+          x: targetNode.position.x + oldParent.position.x,
+          y: targetNode.position.y + oldParent.position.y,
+        };
+      }
+      // Sync with SvelteFlow
+      updateNode(targetNode.id, {
+        parentId: undefined,
+        extent: undefined,
+        position: targetVNode.position,
+      });
       d.nodes = [...d.nodes];
     }
   }
