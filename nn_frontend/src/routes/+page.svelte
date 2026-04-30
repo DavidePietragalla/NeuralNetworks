@@ -159,9 +159,15 @@
     if (targetGroup && targetGroup.id !== targetNode.id) {
       if (targetVNode.parentId !== targetGroup.id) {
         console.log("FUNZIONE CHIAMATA");
+        console.log("BEFORE reorder:");
+        d.nodes.forEach((n: any, idx: number) => {
+          console.log(`  [${idx}] ${n.id} parentId: ${n.parentId} position: ${JSON.stringify(n.position)}`);
+        });
+
         // Find the parent (SubGraph) node index
         const parentIndex = d.nodes.findIndex((n: any) => n.id === targetGroup.id);
         const childIndex = nodeIndex;
+        console.log(`parentIndex: ${parentIndex}, childIndex: ${childIndex}`);
 
         // Reorder: parent must come before child in the nodes array
         let newNodes = [...d.nodes];
@@ -172,6 +178,10 @@
           newNodes.splice(parentIndex + 1, 0, childNode);
           d.nodes = newNodes;
         }
+        console.log("AFTER reorder:");
+        d.nodes.forEach((n: any, idx: number) => {
+          console.log(`  [${idx}] ${n.id} parentId: ${n.parentId} position: ${JSON.stringify(n.position)}`);
+        });
 
         // Update VNode
         targetVNode.parentId = targetGroup.id;
