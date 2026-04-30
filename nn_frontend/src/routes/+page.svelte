@@ -193,15 +193,18 @@
         console.log("Calculated relative position:", { x: relativeX, y: relativeY });
         targetVNode.position = { x: relativeX, y: relativeY };
         // Sync with SvelteFlow
-        console.log("Calling updateNode with:", {
+       console.log("Calling updateNode with:", {
           parentId: targetGroup.id,
           position: { x: relativeX, y: relativeY },
         });
+        
         updateNode(targetNode.id, {
           parentId: targetGroup.id,
           position: { x: relativeX, y: relativeY },
         });
-        console.log("After updateNode, d.nodes length:", d.nodes.length);
+        
+        // Log the result
+        console.log("After updateNode, d.nodes:");
         d.nodes.forEach((n: any, idx: number) => {
           console.log(`  [${idx}] ${n.id} parentId: ${n.parentId} position: ${JSON.stringify(n.position)}`);
         });
