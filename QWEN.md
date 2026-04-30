@@ -119,6 +119,15 @@ python src/main.py --config-path=cfg --config-name=base
 - `components/` contains Svelte UI components
 - `Modules/*.json` define module templates (20+ predefined)
 
+### Parent-Child Node Relationships (SubGraphs)
+
+**IMPORTANT**: Parent-child relationships in this project do NOT use `extent: "parent"`. The `extent` property would constrain child nodes inside the parent, preventing manual resizing. We intentionally avoid this to allow users to freely modify node sizes.
+
+- When a node is inside a SubGraph, its position is **relative** to the parent's top-left corner (0,0)
+- When a node is outside any parent, its position is **absolute** (canvas coordinates)
+- Child nodes can be freely resized and repositioned manually without constraint
+- The `extent: "parent"` property is deliberately NOT used in this project
+
 **Diagram Class** (`diagram.svelte.ts`):
 - Central state management for the diagram
 - Manages nodes, edges, stereotypes, and joins

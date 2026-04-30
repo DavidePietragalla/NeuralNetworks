@@ -119,11 +119,11 @@
     }
 
     const intersections = getIntersectingNodes(targetNode).filter((n) => {
-      console.log(n);
+      $inspect(n);
       return n.type === "SubGraph";
     });
     const targetGroup = intersections[0];
-    console.log(targetGroup);
+    $inspect(targetGroup);
 
     const nodeIndex = d.nodes.findIndex((n: any) => n.id === targetNode.id);
     console.log("Node index: ", nodeIndex);
