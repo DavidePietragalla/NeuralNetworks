@@ -114,39 +114,53 @@
       return;
     }
 
-    const intersections = getIntersectingNodes(targetNode).filter(
-      (n) => n.type === "SubGraph",
-    );
+    const intersections = getIntersectingNodes(targetNode).filter((n) => {
+      console.log(n);
+      return n.type === "SubGraph";
+    });
     const targetGroup = intersections[0];
+    console.log(targetGroup);
 
     const nodeIndex = d.nodes.findIndex((n: any) => n.id === targetNode.id);
-    if (nodeIndex === -1) return;
+    console.log("Node index: ", nodeIndex);
+    if (nodeIndex === -1) {
+      console.log(`WARNING: node not found`, targetNode);
+      return;
+    }
+
+    let targetVNode: VNode = d.nodes[nodeIndex];
+
+    if (targetGroup === undefined) {
+      console.log("targetGroup is undefined");
+    }
 
     if (targetGroup && targetGroup.id !== targetNode.id) {
-      if (d.nodes[nodeIndex].parentId !== targetGroup.id) {
-        d.nodes[nodeIndex].parentId = targetGroup.id;
-
-        d.nodes[nodeIndex].position = {
-          x: targetNode.position.x - targetGroup.position.x,
-          y: targetNode.position.y - targetGroup.position.y,
-        };
+      if (targetVNode.parentId !== targetGroup.id) {
+        console.log("FUNZIONE CHIAMATA");
+        targetVNode.parentId = targetGroup.id;
+        targetVNode.extent = "parent";
+        // d.nodes[nodeIndex].position = {
+        //   x: targetNode.position.x - targetGroup.position.x,
+        //   y: targetNode.position.y - targetGroup.position.y,
+        // };
         d.nodes = [...d.nodes];
       }
-    } else if (!targetGroup && d.nodes[nodeIndex].parentId) {
-      const oldParent = d.nodes.find(
-        (n: any) => n.id === d.nodes[nodeIndex].parentId,
-      );
-
+    } else if (!targetGroup && targetVNode.parentId) {
+      console.log("FUNZIONE NON CHIAMATA");
+      // const oldParent = d.nodes.find(
+      //   (n: any) => n.id === d.nodes[nodeIndex].parentId,
+      // );
+      //
       d.nodes[nodeIndex].parentId = undefined;
       d.nodes[nodeIndex].extent = undefined;
 
-      if (oldParent) {
-        d.nodes[nodeIndex].position = {
-          x: targetNode.position.x + oldParent.position.x,
-          y: targetNode.position.y + oldParent.position.y,
-        };
-      }
-
+      // if (oldParent) {
+      //   d.nodes[nodeIndex].position = {
+      //     x: targetNode.position.x + oldParent.position.x,
+      //     y: targetNode.position.y + oldParent.position.y,
+      //   };
+      // }
+      //
       d.nodes = [...d.nodes];
     }
   }
@@ -399,4 +413,3 @@
 <style>
   @import "../lib/styles/page.css";
 </style>
-

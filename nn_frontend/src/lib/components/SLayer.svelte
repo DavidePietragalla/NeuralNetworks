@@ -6,21 +6,23 @@
     Position,
     NodeResizer,
     useStore,
-    type NodeProps
+    type NodeProps,
   } from "@xyflow/svelte";
 
   let { id, data, selected, width, height }: NodeProps = $props();
 
-  let moduleNode = $derived(ENode.fromId(data.enode as string) as Module | undefined);
+  let moduleNode = $derived(
+    ENode.fromId(data.enode as string) as Module | undefined,
+  );
   let nodeColor = $derived(data.color || "#4779c4");
 
   // Get the store to access the current node dimensions
   let store = useStore();
-  
+
   // Use the store's node dimensions (updated by NodeResizer)
   // The store's nodes array is reactive, so derived values will update
-  let currentNode = $derived(store.nodes.find(n => n.id === id));
-  
+  let currentNode = $derived(store.nodes.find((n) => n.id === id));
+
   // Use the node's width/height from the store (numbers), convert to px strings
   // Fall back to data if not available
   let nodeWidth = $derived.by(() => {
@@ -30,7 +32,7 @@
     }
     return data.width || "100px";
   });
-  
+
   let nodeHeight = $derived.by(() => {
     const nodeHeightNum = currentNode?.height;
     if (nodeHeightNum !== undefined && nodeHeightNum !== null) {
@@ -68,7 +70,8 @@
     (data._tick,
     moduleNode?.getType() === "Module" &&
       moduleNode.params.find(
-        (p: { name: string }) => p.name === "out_features" || p.name === "out_channels",
+        (p: { name: string }) =>
+          p.name === "out_features" || p.name === "out_channels",
       )?.value),
   );
 
@@ -110,6 +113,7 @@
       class="custom-node"
       style="--node-bg-color: {nodeColor}; --node-width: {nodeWidth}; --node-height: {nodeHeight};"
     >
+      <NodeResizer color="#ff0072" />
       <Handle type="target" position={Position.Top} />
 
       {#if inFeatures !== undefined}
@@ -125,10 +129,6 @@
       {#if !isLoss}
         <Handle type="source" position={Position.Bottom} />
       {/if}
-
-      <NodeResizer
-        color="#ff0072"
-      />
     </div>
   {/if}
 </div>
