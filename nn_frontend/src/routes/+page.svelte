@@ -118,24 +118,42 @@
       return;
     }
 
+    console.log("=== handleNodeDragStop ===");
+    console.log("targetNode id:", targetNode.id);
+    console.log("targetNode position:", targetNode.position);
+    console.log("targetNode type:", targetNode.type);
+
+    const allNodes = d.nodes;
+    console.log("All nodes in diagram:", allNodes.length);
+    allNodes.forEach((n: any, idx: number) => {
+      console.log(`  [${idx}] ${n.id} (type: ${n.type})`);
+    });
+
     const intersections = getIntersectingNodes(targetNode).filter((n) => {
-      // $inspect(n);
+      console.log("Checking intersection:", n?.id, "type:", n?.type);
       return n.type === "SubGraph";
     });
+    console.log("Intersecting SubGraphs found:", intersections.length);
+    intersections.forEach((n: any) => {
+      console.log("  -", n.id, "position:", n.position);
+    });
+
     const targetGroup = intersections[0];
-    // $inspect(targetGroup);
+    console.log("targetGroup:", targetGroup?.id);
 
     const nodeIndex = d.nodes.findIndex((n: any) => n.id === targetNode.id);
-    console.log("Node index: ", nodeIndex);
+    console.log("Node index in d.nodes:", nodeIndex);
     if (nodeIndex === -1) {
       console.log(`WARNING: node not found`, targetNode);
       return;
     }
 
     let targetVNode: VNode = d.nodes[nodeIndex];
+    console.log("targetVNode parentId:", targetVNode.parentId);
+    console.log("targetVNode position (before):", targetVNode.position);
 
     if (targetGroup === undefined) {
-      console.log("targetGroup is undefined");
+      console.log("targetGroup is undefined - no SubGraph detected under cursor");
     }
 
     if (targetGroup && targetGroup.id !== targetNode.id) {
@@ -163,12 +181,23 @@
           y: targetNode.position.y - targetGroup.position.y,
         };
         // Sync with SvelteFlow
+        console.log("Calling updateNode with:", {
+          parentId: targetGroup.id,
+          position: {
+            x: targetNode.position.x - targetGroup.position.x,
+            y: targetNode.position.y - targetGroup.position.y,
+          },
+        });
         updateNode(targetNode.id, {
           parentId: targetGroup.id,
           position: {
             x: targetNode.position.x - targetGroup.position.x,
             y: targetNode.position.y - targetGroup.position.y,
           },
+        });
+        console.log("After updateNode, d.nodes length:", d.nodes.length);
+        d.nodes.forEach((n: any, idx: number) => {
+          console.log(`  [${idx}] ${n.id} parentId: ${n.parentId}`);
         });
       }
     } else if (!targetGroup && targetVNode.parentId) {
