@@ -114,13 +114,25 @@ export class Diagram {
     });
   }
 
-  public deleteNode(id: string) {
+  public deleteNode(id: string, checkConfirm: boolean = false) {
+    if (this.nodes.find((n: any) => n.id === id)?.type === "SubGraph") {
+        let confirmDelete = true;
+        if (!checkConfirm) {
+          confirmDelete = confirm(
+            "Sei sicuro di voler eliminare questo SubGraph? Verranno eliminati anche tutti i nodi al suo interno.",
+          );
+          if (!confirmDelete) return;
+        }
+      for (const node of this.nodes.filter((n: any) => n.parentId === id)) {
+        this.deleteNode(node.id, true);
+      }
+    }
+
     let old_edges = this.edges.filter(edge => edge.source !== id && edge.target === id);
     old_edges.forEach(edge => {
       let source = ENode.fromId(edge.source);
       let target = ENode.fromId(edge.target);
 
-      // Typo corretto: "targer" -> "target"
       if (source === undefined || target === undefined)
         throw Error("the source or target are undefined");
 
