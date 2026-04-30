@@ -113,7 +113,6 @@
       class="custom-node"
       style="--node-bg-color: {nodeColor}; --node-width: {nodeWidth}; --node-height: {nodeHeight};"
     >
-      <NodeResizer color="#ff0072" />
       <Handle type="target" position={Position.Top} />
 
       {#if inFeatures !== undefined}
@@ -130,6 +129,8 @@
         <Handle type="source" position={Position.Bottom} />
       {/if}
     </div>
+
+    <NodeResizer color="#ff0072" />
   {/if}
 </div>
 

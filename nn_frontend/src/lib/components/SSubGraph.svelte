@@ -1,25 +1,26 @@
 <script lang="ts">
-  import {
-    NodeResizer,
-    useSvelteFlow,
-    type NodeProps
-  } from "@xyflow/svelte";
+  import { NodeResizer, useSvelteFlow, type NodeProps } from "@xyflow/svelte";
   import { ENode } from "$lib/model/node";
   import { SubGraph } from "$lib/model/subgraph";
+  import type { VNode } from "$lib/view/node";
 
-  let { id, data, selected, width, height }: NodeProps = $props();
+  // let { id, data, selected, width, height }: NodeProps = $props();
+
+  let vnode: VNode = $props();
 
   const { updateNode } = useSvelteFlow();
-  
-  let subGraph = $derived(ENode.fromId(data.enode as string) as SubGraph);
 
-  let displayWidth = $derived(`${width || 400}px`);
-  let displayHeight = $derived(`${height || 300}px`);
-  let nodeName = $derived((data._tick, subGraph?.name || "SubGraph"));
+  let subGraph: SubGraph = $derived(
+    ENode.fromId(vnode.data.enode as string) as SubGraph,
+  );
+
+  let displayWidth = $derived(`${vnode.width || 400}px`);
+  let displayHeight = $derived(`${vnode.height || 300}px`);
+  let nodeName = $derived((vnode.data._tick, subGraph.name || "SubGraph"));
 
   // --- HANDLERS PER ACCESSIBILITÀ ---
   function handleInternalClick() {
-    console.log(`SubGraph ${id} selezionato`);
+    console.log(`SubGraph ${vnode.id} selezionato`);
   }
 
   function handleKeyDown(event: KeyboardEvent) {
@@ -33,7 +34,7 @@
 
 <div
   class="subgraph-wrapper"
-  class:selected
+  class:vnode.selected
   style="width: {displayWidth}; height: {displayHeight};"
   onclick={handleInternalClick}
   onkeydown={handleKeyDown}
@@ -59,9 +60,8 @@
     border: 2px dashed #4779c4;
     box-sizing: border-box;
     cursor: pointer;
-    transition: width 0.1s ease, height 0.1s ease;
   }
-  
+
   .subgraph-wrapper:focus-visible {
     outline: 2px solid #ff0072;
     outline-offset: 2px;
@@ -87,3 +87,4 @@
     flex-grow: 1;
   }
 </style>
+

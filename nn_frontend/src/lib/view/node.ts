@@ -11,8 +11,7 @@ export class VNode {
   public parentId?: string;
   public extent?: 'parent';
   public style?: string;
-  public expandParent: boolean = true
-
+  public selected?: boolean = false;
 
   constructor(
     node: ENode,
@@ -44,11 +43,11 @@ export class VNode {
       height: height || "60px",
       _tick: Date.now()
     };
-    
+
     this.width = width || "100px";
     this.height = height || "60px";
     if (this.type === "SubGraph") {
-        this.style = "width: 400px; height: 300px; background-color: rgba(71, 121, 196, 0.1); border: 2px dashed #4779c4; z-index: -1;";
+      this.style = "width: 400px; height: 300px; background-color: rgba(71, 121, 196, 0.1); border: 2px dashed #4779c4; z-index: -1;";
     }
   }
 }
